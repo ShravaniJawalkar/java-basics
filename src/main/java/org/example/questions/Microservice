@@ -1,0 +1,212 @@
+What are Microservices, and How Are They Different from Monolithic Architecture?
+microservice is loose coupled small independent deployable services . which communicate with each other through light weight protocol
+like (Http/rest, grpc) for synchronous communication and  message broker like kafka and rabbitmq for asynchronous communication.
+Monolithic architecture has tightly couple module no independent deployable unit. all module are part of single deployable unit.
+
+What are the advantages of Microservices Architecture?
+independent deployable unit - each service can be deployed independently without affecting other services.
+scalability - each service can be scaled independently based on the load.
+independent code base - each service can have its own code base and technology stack.
+decentralized database - each service can have its own database.
+fault isolation and resilience - if one service fails it does not affect other services.
+technology diversity - each service can use different technology stack.
+API communication - each service can communicate with other services through light weight protocol like http/rest, grpc.
+Continuous delivery and deployment - each service can be deployed independently using CI/CD pipeline.
+parallel development of multiple services by different teams.
+fast release cycle  - each service can developed deploy and tested independently.
+single responsibility principle - each service can have single responsibility and can be developed by small team.
+
+monolithic shortcomings address by microservices
+as monolithic application are good for small scale application but it creates complexity as application grow in size.
+
+Code complexity over time - as code base grow it become difficult to maintain and understand.
+Scalability bottleneck - as monolithic application can not be scaled independently.
+lack of Fault isolation - if one module fails entire application can be affected.
+Deployment challenges - it can't be partially redeployed. even smaller change require complete rebuild and redeploy.
+team collaboration - as multiple team work on same code base it create merge conflict and code ownership issue.
+
+What are the challenges of Microservices Architecture?
+increased complexity
+    handling microservice-to-microservice communication, network failures, logging and debugging is complex.
+Communication Overhead
+inter process communication through method call is easy compare to API calls as it add network  latency.
+Operational Overhead
+each service has it own deployment pipeline , monitoring and longing and resource infrastructure.  managing it is complex.
+Data Consistency
+Transaction spanning in microservice is complex(need to use saga pattern) as each service has its own database.
+Cost
+Running each service on separate infrastructure(Container) and deploying it on different (kubernetes) node can be costly.
+
+
+when to use microservices?
+Growing Complexity
+Frequent Changes
+Scalability Requirements
+Team Structure
+example of ecommerce application where we can have separate services for user management, product catalog, order management, payment processing, inventory management, shipping and notification.
+
+when not to use microservices?
+for Simple Application
+which can't grow large in size and complexity.
+example - simple blog application. WordPress Content Management System.
+
+What are the core benefits of using a microservices architecture? What are the trade-offs?
+
+How do you decide when to use microservices vs. monolith?
+
+How do you identify and design microservices?
+
+How would you manage communication between microservices?
+use of synchronous communication using REST/HTTP or gRPC for request-response communication.
+use of asynchronous communication using message broker like Kafka, RabbitMQ for event-driven communication.
+
+What strategies would you use to handle data consistency between microservices?
+using SAGA pattern for distributed transaction management.
+How do you maintain loose coupling and high cohesion between services?
+
+What is contract testing, and why is it important in microservices?
+it defines interaction between consumer and producer
+it specify info like
+structure of request and response
+communication api endpoint and it's behavior
+constraint, validation rule and header info
+in short it checks that weather the consumer service can interact with producer without deploying both together
+
+Why is Contract Testing Important in Microservices?
+as due to evolving nature of microservices where frequent changes are made to services.
+changing api header,request and response structure. so contract test ensure any change in producer service may not affect interaction
+with consumer service.
+prevent-integration-issue - as contract test validate interaction between consumer and producer service.
+by writing api contract in json file
+Faster than traditional end-to-end testing-
+it test interaction between two without deploying both service.
+Enables Independent Development:
+Support CICD - as contract test doesn't need actual service to be deploy for interaction it can be easily integrated with CICD pipeline
+
+framework for contract testing
+PACT- support both REST and event-driven architecture. it is consumer driven contract testing tool.
+OpenAPI/Swagger - Support Rest Primarily with prims and dredd
+dredd used for mocking of api request and response validation.
+prims used for mocking of HTTP/REST API for validating request and send request to the Prims mock server embedded in your test through postman. and genearte
+response as per openApi.yml contract.
+AsyncApi - support event-driven architecture
+
+OpenAPI/Swagger
+cloud:spring-cloud-starter-contract-verifier-
+enforcing producer to strictly adder with consumer contract.
+generating unit test case from openApi.yml and validating the request. consumer driven contract
+org.mock-server:mockserver-netty:5.14.0- partially it is correct that it mock producer service for contract testing.
+ it mocks the http request, and provide richer support on request validation, interception and response customization, fault injection and proxy creation but independent of framework
+
+-org.wiremock.integrations:wiremock-spring-boot:3.6.0 - mock HTTP api mock producer for consumer site testing crete embedded wiremock instance and integrate with
+spirngboot test.
+
+Dependency	                         Supports Contract Generation?	Primary Purpose in Contract Testing Workflow
+spring-cloud-starter-contract-verifier	Yes	                           Generates and validates contract tests on the producer. Provides stubs for consumers.
+mockserver-netty	                    No	Mocking/intercepting HTTP requests. Useful for higher-level integration tests or debugging.
+wiremock-spring-boot	                No	Mocking HTTP APIs for consumer testing. Stubs are manually set or generated externally.
+
+How do you handle versioning of APIs in a microservice architecture?
+there are different versioning strategy
+Semantic Versioning - using major.minor.patch format
+Backward Compatibility - making non-breaking changes in minor version and breaking changes in major version.
+Deprecation Strategy - communicate deprecation plan to consumers and provide alternative.
+and add Deprecation notice or warring on api with expiry date
+Documentation - use OpenAPI/Swagger to document different version of API.
+
+techniques
+adding version in URL path - /api/v1/resource
+adding version in header - X-API-Version: 1
+adding version content negotiation - using Accept header application/vnd.company.resource.v1+json
+using query parameter - /api/resource?version=1
+using version in domain - v1.api.company.com/resource for major version change
+
+How do you handle scalability in a microservices architecture?
+we will scale service horizontally by creating multiple instance of service using kubernetes pod
+to check the availability of instance and load balancing we will use eureka discovery server and api gateway like spring cloud gateway.
+we will register all instance of service on eureka it provide client side load balancing. each client as the register of instances of another service
+eureka discovery
+    Server
+    spring-cloud-starter-netflix-eureka-server
+    @EnableEurekaServer
+    application.properties
+    eureka.client.register-with-eureka=false if want can make true
+    eureka.client.fetch-registry=true/false if multiple eureka server then make true if not make false
+    eureka.client.region=default
+    eureka.client.availability-zones.default=default
+    eureka.client.service-url.defaultZone=http://localhost:8761/eureka/
+    eureka.client.healthcheck.enabled=true
+    eureka.client.lease-expiration-duration-in-seconds=30
+    for client
+    spring-cloud-starter-netflix-eureka-client
+      eureka.client.register-with-eureka= true
+      eureka.client.fetch-registry=true
+      eureka.client.service-url.defaultZone=http://localhost:8761/eureka/
+      eureka.client.lease-renewal-interval-in-seconds=10
+Api Gateway
+for async
+spring-cloud-starter-gateway-webflux
+for sync
+spring-cloud-starter-gateway
+@EnableDiscoveryClient - does automatic registration with eureka server
+application.properties
+spring.cloud.discovery.enabled=true fetch registry and reroute request to instance of service
+spring.cloud.gateway.discovery.locator.enabled=true - to enable dynamic routing(register a service url for the service redirect request to instance of service)
+spring.cloud.gateway.discovery.locator.lower-case-service-id=true - to make service id in lower case
+spring.cloud.gateway.routes[0].id=service1
+spring.cloud.gateway.routes[0].uri=lb://SERVICE1 - lb is for load balancing
+spring.cloud.gateway.routes[0].predicates[0].Path=/service1/** - route request to service1 instance if path start with /service1
+spring.cloud.gateway.routes[0].predicates[0].Header=X-Request-Source,Mobile - route request to service1 instance if header X-Request-Source is Mobile
+spring.cloud.gateway.routes[0].predicates[0].QueryParameter=version,1 - route request to service1 instance if query parameter version is 1
+spring.cloud.gateway.routes[0].predicates[0].Method=GET - route request to service1 instance if method is GET
+spring.cloud.gateway.routes[0].predicates[0].RemoteAddr=
+spring.cloud.gateway.routes[0].filters[0].AddRequestHeader=X-Request-Foo, Bar - add header to request before sending to service1 instance
+spring.cloud.gateway.routes[0].filters[0].AddResponseHeader=X-Response-Foo, Bar - add header to response before sending to client
+spring.cloud.gateway.routes[0].filters[0].setPath=/newpath - change the path of request before sending to service1 instance
+spring.cloud.gateway.routes[0].filters[0].RewritePath=/service1/(?<segment>.*), /$\{segment} - rewrite the path of request before sending to service1 instance
+spring.cloud.gateway.routes[0].filters[0].StripPrefix=1 - strip the prefix of request before sending to service1 instance
+
+Circuit Breaker
+What is Circuit Breaker, and how does it work?
+it is mechanism to handle failure gracefully in microservice architecture. it support fault tolerance and resilience.
+it has three state
+close normal operation request are send to intended service if there are some failure occurs and that failure reaches to threshold then circuit is open
+open - no request are send to  intended service . all request are redirect to fallback response. after cooling period the circuit will goes to half open state.
+half-open - we can send minimum number of request when circuit is half open let say 3 it will check if we are getting success response from intended service then circuit will goes to close state
+otherwise if we are getting failure response and reach to max threshold then circuit will open again.
+how to implement circuit breaker in spring boot microservice?
+spring-cloud-starter-circuitbreaker-resilience4j dependency
+@CircuitBreaker(name= "name of service", FallBackMethod="method name for fallback response")
+FallBackMethod signature should be same as original method with addition of Throwable parameter at last.
+in application.properties we need to add certain configuration
+resilience4j.circuitbreaker.instances[0].failureRateThreshold=50 - percenteage of request failure to oen circuit
+resilience4j.circuitbreaker.instances[0].slidingWindowSize=10 - number of request to consider for failure rate calculation
+resilience4j.circuitbreaker.instances[0].minimumNumberOfCalls=5 it act as counter in sliding window in one window time frame how many calls send to check failure rate
+resilience4j.circuitbreaker.instances[0].minimumNumberOfCallsInHalfOpenState=3 - number of request to check in half open state to close the circuit
+resilience4j.circuitbreaker.instances[0].waitDurationInOpenState=10000 - cooling period after which circuit will goes to half open state
+for Variable Response Time
+resilience4j.circuitbreaker.instances[0].slowCallRateThreshold=50 - percentage of slow call to open circuit
+resilience4j.circuitbreaker.instances[0].slowCallDurationThreshold=2s - duration after which call is consider as slow call
+
+for exponential backoff retry
+resilience4j.retryer.instances[0].maxRetryAttempts=2 - number of retry attempt
+resilience4j.retryer.instances[0].waitDuration =2s - wait duration between retry attempt
+resilience4j.retryer.instances[0].exponentialBackoffMultiplier=2 - multiplier for exponential backoff
+resilience4j.retryer.instances[0].exponentialMaxWaitDuration=10s - maximum wait duration for exponential backoff
+
+How do you design for fault tolerance and resiliency in a microservices ecosystem?
+variable response
+exponential backoff retry discuss
+
+rate limiting
+use to manage burst traffic and prevent abuse of service.
+and API throttling to limit the number of request from a client in a given time frame.
+algorithm
+token bucket bucket size and refill- interval define rate of request.
+leaking bucket maintain queue of request and process each request at fixed rate.
+fixed window counter fixed window with request counter to process
+sliding window log- log the time stamp of each request and define maxRateLimit of request can get logged in time frame.
+if maxRateLimit reached then request rejected.
+sliding window counter - maintain multiple fixed window with counter and define maxRateLimit of request can be processed in time frame.
+it use mathematics calculation to determine the request can be processed or not.
+for edge cases 60 percent of old timestamp request + 100 percent of new timestamp request < maxRateLimit then request can be processed.

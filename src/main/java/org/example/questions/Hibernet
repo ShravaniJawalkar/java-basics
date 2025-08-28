@@ -1,0 +1,179 @@
+ 1. What are the advantages of Hibernate over JDBC?
+ What is ORM in Hibernate?
+ 3. Is hibernate prone to SQL injection attack?
+ No, with the help of criteria api, and Query Parameter binding in HQL, it is not prone to SQL injection attack.
+
+ 4. Can you explain the concept behind Hibernate Inheritance Mapping?
+ sql does not support inheritance but with the help of hibernate it can possible as it convert java code  to sql compatible code
+ various inheritance strategy
+ single table strategy - @DiscriminatorColumn and @DiscriminatorValue
+ joined strategy - for each class a separate table is created and foreign key is created for storing reference of parent class field
+ Table per class strategy - separate table is created for each class including parent class. it use union to fetch the result.
+
+ 5. How do you create an immutable class in hibernate?
+ @Immutable annotation on entity class
+  What can you tell about Hibernate Configuration File?
+  hibernate.cfg.xml
+   Can you explain what is lazy loading in hibernate?
+   What do you think about the statement - “session being a thread-safe object”? No session are not thread safe. these are single unit of work with db. so it should not be share across multiple thread.
+   What is a SessionFactory?
+    What is a Session in Hibernate?
+    11. What are some of the important interfaces of Hibernate framework?
+    configuration, session, sessionFactory, transaction query criteria
+    12. What is the difference between first level cache and second level cache?
+
+     Explain hibernate mapping file
+     What are the most commonly used annotations available to support hibernate mapping?
+      Explain Hibernate architecture
+1. What is the role of the EntityManager in JPA?
+creates a persistent object for entities which work as first level cache and provide methods to perform CRUD operations on the entities.
+provide Transaction management and query execution.
+    2. What is the purpose of the @Entity annotation in JPA?
+    it defines a class as an entity bean and maps it to a database table.
+1. What is the purpose of the no-args constructor in an Entity bean?
+   it use in case of egar and lazy loading . here at run time it creates proxy object using reflection utils which call class.newInstance() method to create a new instance of the class.
+   so if no-arg constructor is not present then it will throw an exception(HibernetException).
+ What happens when the no-args constructor is absent in the Entity bean?
+ throws an exception (HibernateException) because Hibernate uses reflection to create instances of the entity class, and it requires a no-args constructor to do so.
+   5. What is the difference between @OneToOne and @ManyToOne annotations in JPA?
+   @OneToOne represents a one-to-one relationship between two entities, while @ManyToOne represents a many-to-one relationship where multiple instances of one entity can be associated with a single instance of another entity.
+   6. How do you define a primary key in JPA?
+   You can define a primary key using the @Id annotation on a field or property in the entity class.
+   7. What is the purpose of the @GeneratedValue annotation in JPA?
+   It is used to specify how the primary key value should be generated, such as using an auto-increment strategy or a sequence.
+Explain Hibernate architecture?
+Hibernate architecture contains
+1. Configuration: This is where Hibernate is configured, typically through a configuration file(hibernate.cfg.xml) or programmatically.
+2. SessionFactory - This is a factory for creating Session objects. It is a heavyweight object and should be created once per application(Persistent Unit meaning once per db).
+3. Session - This is a lightweight object that represents a single unit of work with the database. It is used to perform CRUD operations and manage the persistence context.
+4. Transaction - This is used to manage transactions in Hibernate. It allows you to commit or rollback changes made during a session.
+5. Query - This is used to execute queries against the database. Hibernate supports both HQL (Hibernate Query Language) and Criteria API for querying.
+6.criteria - This is a way to create queries using a programmatic approach, allowing for dynamic query generation based on criteria objects.
+
+4. Can you tell the difference between getCurrentSession and openSession methods?
+getCurrentSession()
+This method returns the session bound to the context.	.
+This session object scope belongs to the hibernate context and to make this work hibernate configuration file has to be modified by adding <property name = "hibernate.current_session_context_class"> thread </property>. If not added, then using the method would throw an HibernateException.
+This session object gets closed once the session factory is closed.
+In a single-threaded environment, this method is faster than openSession().
+openSession()
+This method always opens a new session
+A new session object has to be created for each request in a multi-threaded environment. Hence, you need not configure any property to call this method
+It's the developer’s responsibility to close this object once all the database operations are done.
+In single threaded environment, it is slower than getCurrentSession()single-threadeda
+
+1. What happens when the no-args constructor is absent in the Entity bean?
+
+Can we declare the Entity class final?
+No because hibernate creates proxy class for the entity class for
+lazy loading which call the db when actually the object get invoke. in proxy class it extend the entity bean class so if we create it final then we can't extend it.
+an hence lazy loading is not supported.
+
+3. What are the states of a persistent entity?
+Transient <-> PERSISTENT <-> DETACHED
+TRANSIENT - the entity is not associated with any session and does not have a persistent identity.
+PERSIST -saved to the database and has a persistent identity.
+MERGE - the entity is in the process of being saved or updated.
+DETACHED - the entity is no longer associated with a session, it will directly hit the DB. we use session.lock to again associate with the persistent context.
+REMOVED - th data associated with that entity object is remove from persistent context not from DB when flush is called it will be clear from persistent context and store to db
+
+4. Explain Query Cache
+using ehcache.xml file we can configure the query cache(region name, max entries, time to live etc). which cache the result of the query.
+
+it does not store raw data or entity objects in cache it store database result such as row, column, metadata such as eviction policy, concurrency strategy, ttl,region etc.
+
+5. Can you tell something about the N+1 SELECT problem in Hibernate?
+yes it comes when we have lazy loading of entities in case of one to many and many to many mapping where 1 query is hit to fetch parent entity and N query is hit to fetch list of child entity.
+N+1 problem can be solve by using JOIN FETCH(does not support pagination) keyword in HQL or by using @EntityGraph(classname.class)(support pagination)
+or by using batch size(@BatchSize(size=10)) annotation on the collection of child entity or by using subselect(fetch = FetchMode.SUBSELECT) annotation on the collection of child entity.
+
+8. What is Single Table Strategy?
+here the single table is create for parent and child entity
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+and @DiscriminatorColumn(name = "Employee_Type", discriminatorType = DiscriminatorType.STRING)
+@DiscriminatorValue("Contract") this is used to differentiate the child entity in the single table.
+What is Table Per Class Strategy?
+here a separate table is created for each child and parent entity. reduce the performance as it use union to fetch the result
+
+@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
+
+what is Joined Strategy?
+here a separate table is created for subclasses. and use joins to fetch the result. slow the performance as it use joins to fetch the result.
+
+10. Can you tell something about Named SQL Query
+we used name query when we want to define any query at entity level and use it's name when ever required in @Query annotation or in createNamedQuery() method of session object.
+to reduce the code duplication and easy to maintain.
+we can achieve this by using
+@NamedQuery(name = "Employee.findByName", query = "FROM Employee e WHERE e.name = :name")
+for writing sing named query
+@NamedQueries({
+    @NamedQuery(name = "Employee.findByName", query = "FROM Employee e WHERE e.name = :name"),
+    @NamedQuery(name = "Employee.findAll", query = "FROM Employee")
+})
+for multiple named queries
+
+11. What are the benefits of NamedQuery?
+it allow the mechanism of failed fast as query is validated at the creation of session factory.
+it reduce code duplication as we can define the query at entity level and use it any where in the application.
+
+How do you handle optimistic and pessimistic locking in Hibernate?
+Optimistic Locking:
+it is used on database level by using @Version annotation of hibernate.
+it maintain versions of table update.
+it allows multiple concurrent request to access the data at same time.
+it checks for conflict while updating the data in DB. it check if version present in memory(persistent context) is match with the version present in DB if match update db with latest version
+if not match throw StaleObjectStateException.
+Pessimistic Locking:
+it is used on database level meaning on row level by using different locking strategies.
+it is used when there is frequent update happens
+it add strict locking on the data so that no other transaction can access the data until the lock is released.
+types of LockModeType
+PESSIMISTIC_READ - it acquires a shared lock on the data while reading no write are allowed until the lock is released.
+PESSIMISTIC_WRITE - it acquires an exclusive lock on the data on other transaction can read or write until lock is released.
+in case of conflict raise LockTimeoutException
+
+Explain the concept of detached entities and how to reattach them using merge() or update().
+both are use to reattaches the detached entity to the persistent context. with difference that
+the entity object is present in memory but no longer associated with persistent context.
+merge() - create new managed entity instance and copy the state from detach entity to managed entity instance.
+it does not throw exception  if entity already present in session. it automatically maintain consistency between db and persistent context
+it useful in case when data is inconsistent between db and persistent context.
+it useful in case when data is inconsistent between db and persistent context.
+update() - reattach to the current entity instance. it can raise NonUniqueObjectException  if the entity is already present in the persistent context.
+it useful whe the data state is consistent between db and persistent context.
+
+Describe common Hibernate exceptions (e.g., LazyInitializationException, StaleObjectStateException) and how to resolve them.
+LazyInitializationException- this exception is occurred if entity is getting loaded outside of the entity session.
+meaning before lazily loading the entity session is closed or entity is getting loaded in different session.
+StaleObjectStateException - this exception occurred in case of optimistic locking when the memory version does not match with db version.
+
+Discuss Hibernate best practices for large-scale applications, including connection pooling, logging, and error handling.
+Explain how to integrate Hibernate with Spring or other frameworks.
+provide hibernate-connection-timeout
+hibernate-connection-max-pool-size
+hibernate-connection-min-pool-size
+hibernate-connection-idle-timeout
+
+do not open to many connections to the database
+
+enable logging during development to debug issues
+
+do not log db query in production as it can slow down the performance and cause security issue
+
+use transaction management to handle error and rollback in case of exception
+
+How does Hibernate manage transactions? Discuss both programmatic and declarative transaction management (e.g., with Spring), transaction isolation levels, and concurrency strategies
+
+we need to use @EnableTransactionManagement on SpringBootApplication class to enable transaction management in spring.
+which  invoke TransactionInterceptor class to manage transaction. it creates proxy of a class where @Transactional annotation is present and manage transaction.
+it provide commit and rollback functionality through transactional with help of AOP
+declarative
+usage of @Transactional annotation at class level or method level to manage transaction.
+
+programmatic
+configure PlatformTransactionManager bean in configuration class and use it to manage transaction.
+provide Transaction Definition bean to define the transaction properties like isolation level, propagation behavior etc.
+and then call getTransaction method of PlatformTransactionManager to start transaction and then call commit or rollback method to end the transaction.
+
+or we can use Transaction Template class which accepts TransactionCallBack Functional interface which has doInTransaction method where we can write our db logic and it automatically manage transaction.
+

@@ -1,0 +1,266 @@
+1. What do you understand by an unreachable catch block error?
+when we have a multiple catch block and most specific exception is define at end or after the more generic exception meaning
+
+the Exception e is define before catch block of definition of RuntimeException catch block
+here Runtime Exception is child of Exception. so
+catch block should have more specific exception to More Generic Exception at last in hierarchy.
+
+2. What is an exception in Java?
+it is an abnormal event occurred which can lead to program or application termination
+
+3. What is the difference between ClassNotFoundException and NoClassDefFoundError?
+both the exception comes when class loader or JVM try to load class from classpath only difference is
+ClassNotFoundException - this exception comes when JVM or class loader not found the class in class path when trying to load through Class.forName() or loadClass() method
+NoClassDefFoundError- this exception comes when class was present compile time but not able to find at runtime
+
+. What is the output of this below program?
+public class TestClass
+{
+    public static void main(String[] args)
+    {
+        int a = 30;
+        int b = 40;
+        int c = 10;
+        int expression = (a * b)/(a - b + c);
+        System.out.println("Result: " +expression);
+      }
+} --- it will throw ArithMaticException: /division by zero
+
+5. How are the keywords final, finally and finalize different from each other?
+final
+if we decalre data mememner as final then it can't be modified once initialized
+if we delcare method as final then it can't be override
+if we declare class ad final then it can't be extended.
+
+finally
+it is added after try-catch block or try block and this block will always get executed even if there is exception. will not get executeded if there is
+outOfmemory error or stack overflow error. it will not get execute if either try or catch block have System.exit(0);
+finalize- this is a method which get call by garbage collector just before destroying the object.
+
+6. Can we have statements between try, catch and finally blocks?
+No. because this form single unit and if we have statements between them then it will not compile. it will give compilation error.
+
+
+heirarchy of Exception and Error in Java
+            object
+                |
+            Throwable
+                |
+     Error --------------------  Exception
+       |                             |
+   outOfMemoryError         CheckedException      UncheckedException
+       |                             |                      ArithmeticException,NullPointerException,ClassCastException,IllegalArgumentException,IllegalStateException,ArrayIndexOutOfBoundsException,NumberFormatException,UnsupportedOperationException
+   stackOverflowError        ( ClassNotFoundException, IOException, SQLException, InterruptedException, NoSuchFieldException, NoSuchMethodException, CloneNotSupportedException, InstantiationException, IllegalAccessException, InvocationTargetException, ParseException, MalformedURLException, URISyntaxException, TimeoutException )
+
+7. What is Exception Chaining?
+one exception is occurred due to another exception. this gives better visibility to developer to understand the cause of exception.
+fo. ex.
+we have method which take two input and divide them to form result. but the method throw Arithmetic exception because divisor is zero. this divisor input coming from array which throw
+IOException due to this it return zero value and which leads to another exception as Arithmetic Exception. provide feature in java 1.4
+
+8. What is a stack trace and how is it related to an Exception?
+it is a set of line which has details from program start execution steps to the
+program line where error has occurred. it help developer for debug and find out root cause.
+
+9. Can you catch and handle Multiple Exceptions in Java?
+yes. we
+-using Exception class which is base class for all exception. but it is recommended to use more specific exception.
+because using of generic exception make code error prone by throwing exception which was not anticipated during system design leads to abnormal behaviour
+-using multiple try catch block by using more specific exception block first and at the end the usage generic exception
+- from java 7 onwards we can define multiple exception in same catch catch(ArithmeticException | NullPointerException e)
+
+10. Differentiate between Checked Exception and Unchecked Exceptions in Java.
+
+Checked Exception                                         UncheckedException
+which occurred at the time of compilation                       at runtime
+direct subclass of Exception                            direct subclass of RuntimeException
+this need try-catch block or at least need              this doesn't need try-catch block and throw block mandatory
+throw block to tell caller method that exception        it error occurred due to incorrect program logic.
+can occurred
+
+11. How do you handle checked exceptions?
+
+using try-catch or throws keyword at method definition
+
+
+12. What is the difference between the throw and throws keywords in Java?
+
+throw - this is used to throw an exception
+for example if we want to throw some custom exception if that variable not found then we can create a exception NotFound
+and if variable not found then throw not found exception
+throws- is used to define exception at method definition level meaning this method can throw these exception.
+
+13. What are the methods of exception.?
+
+getMessage()- to show error message part of throwable class
+getLocalizeMessage()-by default internally it called getMessage() only but, if the subclass of throwable weather it is exception or custom exception overridden this method and
+provide Localized message then it will
+return localized message(Local object for message in region specific language)
+synchronized Throwable getCause() - this return the cause of exception. if cause of exception is not define return null. the cause of exception is return if provided in constructor of throwable or after construction initialized by calling intCall().
+String toString() - return Exception in string format consisting name of Throwable class and Localized message.
+void printStackTrace() - print the stack trace of exception to standard error stream on console. or we can use PrintWriter or PrintStream to write the log in file
+
+15. What is exception propagation in Java?
+Exception propagation meaning transferring the exception control from one to another method till that exception get handled
+if it is not get handled by any method the control will reach to Main and program will get terminated.
+
+example
+main() {
+    method1();
+}
+method1() {
+    method2();
+}
+
+method2() {
+    throw new Exception("Something went wrong");}
+
+    not handled by method2 control goes to method1 not handle by method1 control goes to main method there also it is not handled program will get terminated.
+
+How are exceptions handled in Java?
+using
+throws
+try-catch and finally block
+try-with-resource block which autoclose resource by implementation  AutoCloseable interface which has close() method
+
+What are some of the best practices to be followed while dealing with Java Exception Handling?
+throw exception early and catch exception as late as possible in program execution.
+if exception is not handle by any of the predefined exception then define custom exception.
+use specific exception at top of hierarchy and generic exception at last in catch block.
+if your are using java 7 and above then use try-with-resource block to handle resource which need to close. it will close resource automatically.
+
+2. What are the rules we should follow when overriding a method throwing an Exception?
+rule1- if parent is not throwing any exception then child class which override the parent class method can throws unchecked exception but not checked exception.
+    class ParentDemo {
+        void doThis() throws IOException, ParseException {
+            // ...
+        }
+
+        void doThat() throws IOException {
+            // ...
+        }
+    }
+
+    class ChildDemo extends ParentDemo {
+        void doThis() throws IOException {
+            // ...
+        }
+
+        void doThat() throws FileNotFoundException, EOFException {
+            // ...
+        }
+    }
+rule2 - if parent method is throwing checked exception then child method can throws any unchecked exception and checked exception of same level or its sub exception.
+        class ParentDemo {
+            void doThis() throws FileNotFoundException {
+                // ...
+            }
+        }
+
+        class ChildDemo extends ParentDemo {
+            void doThis() throws IOException {
+                // Compilation error because IOException is of broader scope than FileNotFoundException
+            }
+        }
+        Not valid
+        class ParentDemo {
+            void doThis() throws FileNotFoundException {
+                // ...
+            }
+        }
+
+        class ChildDemo extends ParentDemo {
+            void doThis() throws IOException {
+                // Compilation error because IOException is of broader scope than FileNotFoundException
+            }
+        }
+rule3 - if parent method throws unchecked exception then child can throws any number of unchecked exception
+    class ParentDemo {
+        void doThis() throws IllegalArgumentException {
+            // ...
+        }
+    }
+
+    class ChildDemo extends ParentDemo {
+        void doThis() throws ArithmeticException, NumberFormatException, NullPointerException {
+            // ...
+        }
+    }
+
+3. Is it possible to throw an Exception inside a Lambda Expression’s body?
+yes, it is possible to add throw in lambda expression body.
+but if we are using lambda expression in functional interface then we can't throw checked exception.only unchecked exception are throw
+because functional interface method does not have throws clause. if we are creating custom functional interface
+then we can throw checked and unchecked exception.
+
+5. Are we allowed to use only try blocks without a catch and finally blocks?
+yes we can with try-with-resource block. comes with java 7 onwards.
+before that we need to add try with catch or finally block.
+try-with-resource blocks takes parameter implementing autocloseable interface which has close() method.
+
+try(Scanner scanner = new Scanner(System.in)){
+    String input = scanner.nextLine();
+}
+
+6. Why it is always recommended to keep the clean-up activities like closing the I/O resources or DB connections inside a finally block?
+because finally block will always get execute even if there is exception occurred or not.
+so closing the resources in finally block ensures that all operations are completed then we are closing the connection
+but we need to make sure that no exception or error should occur in finally block. otherwise it will lead to error
+so we need to add validation check before closing the resources in finally block.
+
+7. Does the finally block always get executed in the Java program?
+no there are some cases where finally block not get executed, if System.exit(0) is called in try or catch lock.
+because System.exist(0) stop the run time jvm and program execution.
+
+8. What happens when you run the below program?
+import java.io.IOException;
+import java.io.FileNotFoundException;
+
+import javax.xml.bind.JAXBException;
+
+public class TestExceptionDemo {
+
+	public static void main(String[] args) {
+            try {
+                demoException();
+            } catch (IOException e) {
+                System.out.println(e.getMessage());
+            } catch (FileNotFoundException e) {
+                System.out.println(e.getMessage());
+            } catch (JAXBException e) {
+                System.out.println(e.getMessage());
+            }
+	}
+
+	public static void demoException() throws IOException, FileNotFoundException, JAXBException{
+
+	}
+
+	this will lead to compilation error of Unreachable catch block.
+}
+
+9. Under what circumstances should we subclass an Exception?
+if we want to define custom exception when the standard define
+exception does not match the exception thrown by application or program.
+so while creating custom exception we have to use more specific standard exception as parent class. if does not match then extend Exception class.
+
+What are different scenarios where “Exception in thread main” types of error could occur?
+NoclassDefFoundError - this error occurs when class was present
+UnsupportedClassVersionError - this error occurs when class was compiled with higher version of java than the current running jvm version.
+NoSuchMethodError - this error occurs when class was present
+ArithmeticException - this error occurs when we try to divide by zero or any other arithmetic operation which is not valid.
+
+11. What happens to the exception object after exception handling is complete
+it is eligible for garbage collection . so it will be garbage collected by garbage collector.
+
+12. Is it possible to throw checked exceptions from a static block?
+no we can't throw checked exception from static block. we can add try-catch block to handle the exception
+but we can't use throw keyword in catch block to throw exception.
+because static block get invoke compile time and it is not invoke by other method so we can't use throws clause in static block.
+
+13. What happens when an exception is thrown by the main method?
+if exception is not handle then Runtime JWM will terminate the program and print error message with stack trace on console.
+
+14. What does JVM do when an exception occurs in a program?
+when exception occurred in method it create exception object and pass(throws) it to JVM. then JVM will lookup fo specific handler for the exception if the handler is define it will pass it to that handler
+otherwise it will terminate the program.

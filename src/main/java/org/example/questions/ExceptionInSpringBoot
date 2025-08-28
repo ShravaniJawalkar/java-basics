@@ -1,0 +1,68 @@
+Q1: How does exception handling work in Spring Boot?
+can handle c=globally or locally.
+locally using try catch block
+globally using @ControllerAdvise, @ExceptionHAndler, @ResponseStatus
+
+Q2: What is @ExceptionHandler, and how do you use it?
+this is used on method to define the exception that we need to send response entity.
+or we can use HttpResponse and Exception e as argument to get more details of exception. and called HttpResponse sendError method to send error code and message.
+we can use this annotation in specific controller where we have define custom exception handling in method annotated with @ExceptionHandler
+but it scope will respect to that controller only.
+
+Q3: What is @ControllerAdvice? How is it different from @ExceptionHandler?
+@ControllerAdvice - provide centralized exception handling across multiple controller. this is class level annotation.
+here we can define multiple custom exception handling methods using @ExceptionHandler annotation or ResponseStatus annotation.
+
+Q4: What are default exception handling mechanisms provided by Spring Boot?
+if we not use @exceptionHandler or @ResponseStatus with @ControllerAdvice  then spring boot provide default exception handling mechanism.
+using DefaultHandlerExceptionResolver, which generate ResponseEntityObject with appropriate HTTP status code and error message.
+default Error response include
+timestamp
+status
+path
+error
+Message
+
+Q5: How do you implement a global exception handler in Spring Boot for a REST API?
+
+Q6: How would you handle validation errors in a Spring Boot application?
+@Valid annotation on request body object in controller method. @Validated annotation on model class field.
+and define a method in @ControllerAdvice class with @ExceptionHandler(MethodArgumentNotValidException.class) to handle validation exception
+and method with @ExceptionHandler(ConstraintViolationException.class) for @Validated.
+
+Q7: Explain the use of @ResponseStatus in Spring Boot.
+this can be use on method level or class level to define the HTTP status code that we want to send in response.
+if we create a custom exception class then we define this response status annotation on class level. to send the the configure response every time for this class.
+@ResponseStatus(value = HttpStatus.NOT_FOUND, reason = "Resource not found")
+if we use this annotation on method level it will override default response status code of method.
+
+Q8: How do you customize the default /error endpoint in Spring Boot?
+implementing ErrorController interface in controller class and creating @RequestMapping("/error") method to handle the error response.
+
+Q9: How would you handle nested exceptions or causes in Spring Boot?
+using Throwable::getCause() method to get the root cause of exception and handle it accordingly.
+
+@ExceptionHandler(Exception.class)
+public ResponseEntity<object> handleNestedException(Exception ex) {
+    Throwable rootCause = NestedExceptionUtils.getRootCause(ex);}
+
+Q10: How do you log exceptions effectively in Spring Boot?
+    using logging framework like slf4j or logback to log the exception details in @ExceptionHandler method or in global exception handler class.
+
+Q11: How would you implement custom exception handling for an external API integration?
+suppose we have and external API call in our service class using RestTemplate or WebClient.
+so we will write @ExceptionHandler(HttpClientErrorException.class || ExternalException) method in @ControllerAdvice class to handle the client side error.
+
+ Explain how you would handle exceptions in a microservices architecture with Spring Boot.
+ usage of @ControllerAdvice and @ExceptionHandler to handle exceptions globally in each microservice.
+For inter-service communication (via REST) usage of standardized Error Response (eg. using errorResponse schema)
+    usage of Circuit Breaker pattern (eg. Resilience4j) to handle failures gracefully.
+    usage of centralized logging (eg. ELK stack) to track and analyze exceptions across services.
+    usage of Spring cloud sleuth for distributed tracing of exceptions across services.
+
+ what are the best practices for exception handling in Spring Boot applications?
+    centralize exception handling using @ControllerAdvice and @ExceptionHandler.
+    create custom exception classes for specific error scenarios.
+    return user-friendly error Response with appropriate HTTP status codes.
+    use of logging framework to log exception details.
+    Use actuators for monitoring and alerting on exceptions.

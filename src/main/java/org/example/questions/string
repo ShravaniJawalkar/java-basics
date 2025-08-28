@@ -1,0 +1,19 @@
+Why String is Immutable or Final in Java?
+because string object value is get cached in string pool
+if we use string literal it can be share between multiple client if one client or method change string literal value other also need to follow the same
+but this not the case with String because it is immutable in nature once it's value initialze it can't get changed
+so due to cache it improve performance and memory utilization
+
+4. What is the difference between String on C and Java?
+in c strings is null-terminated character array
+but in java String class is an object that contains a sequence of characters
+
+ Why char array is better than a String for storing passwords?
+ as string are immutable in nature we can't erase it's content from memory
+ but we can erase char array content from memory
+
+ 6. How do you compare two String in Java?
+ equals(),equalsIgnoreCase()
+ 7. Can we compare String using == operator? What is the risk?
+ if we compare it will compare it's reference which will not be same so it will return false
+ so if want to compare if two strings are equal we need to use equalTo() method

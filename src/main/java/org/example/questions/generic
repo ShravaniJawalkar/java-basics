@@ -1,0 +1,109 @@
+Q1. What Is a Generic Type Parameter?
+getData(T parameter) is a method that takes a generic type parameter T.
+getData(String parameter) is a method that takes a String type parameter.
+Q2. What Are Some Advantages of Using Generic Types?
+it resolve the issue of type casting. it works well with collections.
+example if we create the list without type
+List list = new ArrayList<>();
+list.add("o");
+Object o = list.get(0);
+String f = (String)o.get();
+here we need to do explicit type cast and what if we add integer and explicit type casting we forgot then
+it can raise ClassCastException runtime
+List<String> list = new ArrayList<>();
+list.add("o");
+list.add(1) //if we try to add integer in string then it will give error at compile time only.
+String f = o.get();
+What Is Type Erasure?
+ generic type information is not available at runtime. only compiler has access to it.
+ compiler convert the generic type to object type at compile time
+ a bounded type parameter to First bounded class <T extends Number> means T is the type which can be subclass of Number or Number itSelf.
+ provide equivalent cast when retrieving generic object. this is called type erasure that generic types are not know by JVM at run time
+
+ Why Type Erasure Is Important?
+ to preserve backward compatibility with older versions of JAVA that do not support generics.
+
+ Q4. If a Generic Type Is Omitted When Instantiating an Object, Will the Code Still Compile?
+ yes it will compile but it will give warning that raw type is used
+
+ Q5. How Does a Generic Method Differ from a Generic Type?
+ the generic method is a method where type parameter is used and it's scope is live till the method only.
+
+  What Is Type Inference?
+  let say we have a method which accepts a generic type parameter and return the same type.
+    public <T> T getData(T parameter) {
+        return parameter;
+    }
+    Integer number = getData(10); // here compiler can infer the type of T as Integer
+    then compiler can easily infer the return type of parameter for the argument type.
+    no need to specify the return type explicitly
+
+  What Is a Bounded Type Parameter?
+  a bounded type parameter is a type where we bound the specific type can be a child of specific class or that class itself.
+  advantage of it is compiler already know the methods of animal from that we can write more generic algorithm which can be applied for all animal extensions.
+
+  public class Cage<T extends animal> {
+      private T animal;
+
+      public Cage(T animal) {
+          this.animal = animal;
+      }
+
+      public T getAnimal() {
+          return animal;
+      }
+  }
+
+  in this example T is a bounded type parameter which an be any type of its subclass or class itself.
+
+  Cage cat = new Cage<Cat>();
+two types of bounded parameter:
+upper bounded type parameter = <T extends Number> means T is a type which can be subclass of Number or Number itself.
+lower bounded type parameter = <T super Integer> means T is a type which can be superclass of Integer or Integer itself.
+
+Q8. Is It Possible to Declared a Multiple Bounded Type Parameter?
+yes it is possible
+public class Cage<T extends Animal & Comparable> {
+    private T animal;
+
+    public Cage(T animal) {
+        this.animal = animal;
+    }
+
+    public T getAnimal() {
+        return animal;
+    }
+}
+here T should first extends a class and the do implements other interface. so t should be subclass of Animal or Animal itself and
+also should implement the methods of Comparable interface.
+
+. What Is a Wildcard Type?
+a wild card type is a any unknown type which can be used in generic type. it use question mark (?) to represent any type.
+example:
+List<?> list = new ArrayList<>();
+This means list can be of any type It can be Object, String, Integer or any other type.
+
+Q10. What Is the Difference Between a Bounded Type Parameter and a Wildcard Type?
+the bounded type can add and return the specific type of that class or subclass of that class.
+the wildcard follow PECS principle meaning producer extends consumer super
+meaning upper bounder wildcard <T extends Number > it can read the list can't add the element in list
+lower bounded wildcard<T super Number> it can add in list but is return type will always be object.
+
+What Is an Unbounded Wildcard?
+a unbounded wildcard is a type which can be of any type define with <?>.
+example: List<?> list = new ArrayList<String>();
+we can't add any element the list return can be of any type. but this can give cast error
+example: List<Object> list = new ArrayList<String>();
+it will give the compilation error because we can't assign a list of String to a list of Object.
+
+Q12. What Is a Lower Bounded Wildcard?
+
+Q13. When Would You Choose to Use a Lower Bounded Type vs. an Upper Bounded Type?
+it follow PECS principle meaning producer extends consumer super
+
+Q14. Are There Any Situations Where Generic Type Information Is Available at Runtime?
+yes if we add generic type as class field then it will be available at runtime.
+and then with help of reflection we can get the generic type information.
+
+
+

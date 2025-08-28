@@ -1,0 +1,92 @@
+Q1: What is @Async in Spring Boot, and why would you use it?
+Async annotation when applied to any method it execute that method in separate thread instead of main thread.
+this reduce the blocking of main thread and improve application performance.
+helpful in dbquery, remote api call, file processing where it take time to execute.
+
+ How do you enable asynchronous processing in a Spring Boot application?
+ using @enableAsync on Spring boot configuration class.
+ which invoke AsyncAnnotationBeanPostProcessor for setting Executor and AsyncUncaughtExceptionHandler.
+ it creates a bean of AsyncExecutionInterceptor which help in deciding thread executor.
+     protected Executor getDefaultExecutor(@Nullable BeanFactory beanFactory) {
+         Executor defaultExecutor = super.getDefaultExecutor(beanFactory);
+         return (Executor)(defaultExecutor != null ? defaultExecutor : new SimpleAsyncTaskExecutor());
+     }
+
+ Q2: How do you handle exceptions in @Async methods?
+ by default it is handle by AsyncUncaughtExceptionHandler which log the exception.
+ Q3: What happens if you call an @Async method from within the same class?
+
+ if we call async method within same class then that will not executed in separate thread. it execute synchronously in main thread.
+ because Async work on run time proxy creation of class which will provide a thread for execution for given proxy object.
+ so @Async annotation should used in service @service or @component class method and should be called from another class.
+
+ Q4: What are the return types supported by @Async?
+ void ,
+ future
+ completableFuture
+
+ Q5: What are the main differences between @Async and other reactive programming models like Project Reactor/WebFlux?
+ @Async used JAVA executors framework to create thread pool and execute method in separate thread.
+ reactive programming models like Project Reactor/WebFlux use event driven non- blocking approach. it uses event loop reactive stream to process multiple concurrent request
+ use async annotation if we have small application which has a background task that needs to be run in separate thread and for multithreading.
+ use reactive programing model if you have high through and large number of concurrent request. that has to be proceed asynchronously in non-blocking way. and need to have scalability.
+
+ Async by default use which thread pool?
+ by default it uses defaultThreadPoolTaskExecutor where
+ core pool size is 8 and max pool size INTEGER.MAX_VALUE, Keep alive time 60sec and queue capacity is Integer.Max_VALUE
+ create new ThreadPoolTaskExecutor(corePoolSize(8/10), maxPoolSize(Integer.MAX_VALUE), KeepAliveTime(60L), new LinkedBlockingQueue<Runnable>(Integer.MAX_VALUE), threadNamePrefix("Async-"))
+ default thread executor has some drawback
+    it has queue capacity which can not be used. and If queue get full then the low priority task will get blocked for longer time
+    and if queue is full and max capacity is also reached then it will slow down the system completely.
+    we can explicitly define a ThreadPoolTaskExecutor bean in app configuration class to override the default one. it will be automatically detect by spring.
+    so if new define a new Executor bean without using ThreadPoolTaskExecutor then it will not be detect by spring automatically.
+    so then it will invoke simpleAsyncTaskExecutor which create a new thread every time for execution of method.
+    drawback of simpleTaskExecutor is that it can slow down they system if lot of threads are created.
+
+    if we we want to define our custom thread pool executor then we need to creates its bean in app config and use that bean name in Async annotation.
+ Q6: How do you configure the thread pool used by @Async tasks?
+ we can do it by creating ThreadPoolTaskExecutor or - no need to explicitly mentioned bean name in Async annotation spring will automatically detect it.
+ by creating a ThreadPoolExecutor from Java ExecutorService framework. - need to mentioned bean name in Async annotation.
+ in app config class.
+
+ Q7: How is error handling managed when using @Async?
+ if we added the @async on void method the error comes in this method will not be propagated to the caller thread. so it can be lost if not handled properly.
+ using AsyncConfigurer interface we can override getAsyncUncaughtExceptionHandler method to provide our custom exception handler.
+ and override method getDefaultExecutor to provide custom thread pool executor.
+
+ Q8: What are some common pitfalls when using @Async in a Spring Boot application?
+ Self-invocation issue - we can't provide async behavior is same class method call. need to add method in another class to add async behavior.
+ Exception handling Issue - if unhandled exception occur in Async and it is not handled properly then it can't be propagated.
+ to caller which can lead to silent failures.
+ Transaction Propagation issue -  if we use @Transactional on caller method and @Async on calling method then  @Async method will not get execute as part of transaction. it will lost transaction context.
+ not recommended.
+ if we use @Async and @Transactional on same method then it's transaction propagation level will not work properly. because calling method has @async annotation which will run in separate thread and have separate transaction context.
+ Can create High Latency if we use default thread pool executor which can be(simpleTaskExecutor or ThreadPoolTaskExecutor with default configuration) which can create lot of threads and can slow down the system.
+
+ Q9: How would you implement proper transaction handling in an @Async method?
+ I will add @Async on caller method and @Transactional on called method. so that called method will get execute as part of transaction and will not loose transaction context.
+
+Q10: Write a use case where @Async is better than a synchronous approach.
+for email sending functionality upon user registration. when user is register we need to send the confirmation mail
+to user. if we do it synchronously then user will have to wait till email is sent which can take time.
+so we can add @async on send email method which will execute in background till then it  will complete registration.
+
+Q11: When would you NOT use @Async?
+for cpu bounded task where it require lot of cpu resource to complete the task.
+for large concurrent request that needs to be handled in non-blocking way. using event loop.
+Small and quick task which complete in few milliseconds.
+Dependent code the main method which depend on the calling method result.
+
+Q12: Why might @Async not work in a Spring Boot application?
+missing of @EnableAsync in configuration class.
+incorrect configuration of thread pool executor.
+missing of spring-boot-starter-aop dependency in pom.xml
+Proxy-class misconfiguration - if class where @async added on method need to be annotated with @component or @service.
+
+Q13: What are some best practices for working with @Async in Spring Boot?
+always configure thread pool task executor in app config class. to avoid simpleAsyncTaskExecutor. which can cause performance issue.
+use of @Async annotation on method which is called from another class. like service or component class.
+Explicitly handle exception by implementing AsyncConfigure which provide GetAsyncUncaughtExceptionHandler method. where we can provide a custom exception handler which implements AsyncUncaughtExceptionHandler.
+has method handleUncaughtException(Throwable ex, Method method, Object... params);
+usage of @Async cautiously -
+document dispatcher servlet specify where asynchronous code executed especially in complex application application.

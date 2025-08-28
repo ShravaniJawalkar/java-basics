@@ -1,0 +1,199 @@
+LRU - Least Recent Used. it work on the principle of checking history of usage where the item used very less
+LFU - Least Frequently Used it works on the frequency of item use if it is used more frequently then it will be in cache.
+
+FIFO - First In First Out it works on the principle of removing the item which is added first in cache.
+
+Here is a list of questions to help you prepare for the level-up assessment for a senior software role with a focus on caching solutions. These questions cover theoretical concepts, practical knowledge, and implementation with the libraries/frameworks you mentioned.
+
+Distributed and Local Caching Foundations:
+General Questions on Caching:
+
+What is caching, and why is it important in distributed systems?
+caching is used to cache the static and most frequently used data which get change less frequently.
+which improve application performance and response time.
+it is important in distributed system because of fallowing
+Improve performance and response time
+in distributed architecture and microservice communicate with another microservice
+so if we calling another microservice to get same data most of the time. then call to microservice take some time
+because we need to communicate with it over network which add network latency
+so using cache here to cache response can improve performance and response time
+
+reduce load on backend service and database
+sending call each time to service and database for complex queries which not change more frequently.
+can add overhead on underline devices. so caching help here as well storing query data and service response locally
+on calling service.
+
+Bandwidth Optimization: services are communicate over network which add network latency. this can be reduce if
+we use cache
+
+fault tolerance and resilience = if backend service /underline service get fail the cache can be used as fallback response
+for calling service.
+
+Scalability - using distributed caching(redis cache multiple cluster or hazel cast) we can serve multiple request concurrently
+
+CostSaving - as call not goes to underline resource each time the it reduce cpu utilization, memory utilization, reduce IO operation
+result in cost saving
+
+DataBase Query Aggregation - caching complex data base queries. help reduce query execution time.
+
+Cache Usage
+    1. WeApplication - caching static Data HTML,CSS,javascripts script.
+    caching DB query
+    2. Microservice - caching API response, caching complex db query result
+    3. ecommerce app = caching product catalog and product details and price
+Challenges in Cache
+    StaleObject issue - if underline resource is update after cache population then it lead to inconsistent data state.
+    receiver get inconsistent data.
+    Eviction Issue:- as cache has limited memory size we need to Prioritize the data which one to keep and which one to remove.
+    if proper eviction strategy not chosen then it can lead to cache thrashing(if cache get full then it will evict the entry automatically
+    just before it require again meaning inconsistent eviction happen)
+    Cache Miss issue = if required object is not present in cache then call goes to underline resource which can add latency.
+    Complexity in distributed cache= as distributed cache has multiple node maintaining consistency across node is challenge.
+
+What are the differences between local caching and distributed caching?
+Local Cache
+is in memory cache and store memory of single instance of application
+Distributed cache - shared among multiple services of application. use centralize and distributed approach if distributed
+maintain data consistency across all node
+scalability :- we can horizontally scale distributed cache by adding more node. but this is not possible with local
+cache as it is cache per instance stays in instance memory
+data consistency - as distributed cache can have centralized and distributed approach all nodes of cache share and access
+same data. so same data is available for multiple receiver.
+in case of Local cache is cache per instance. change is this cache not reflects to other instance cache.
+other instance cache may have stale data if this cache get updated.
+performance -
+Local cache provide higher performance as it is reside in memory of instance
+Distributed cache slightly slower compare to local cache because we need to communicate with it over
+network which add network latency.
+scope and visibility
+Local cache scope is limited to single instance of application. it is not visible to other instances
+Distributed cache scope is global because it's data shared among multiple services and application
+fault tolerance
+Local cache if instance get down or crash the local cache will be lost because it reside in memory of instance
+Distributed cache provide fault tolerance because if one node get down or lost due to some issue another node is available
+which has consistent data.
+
+example of Local cahce
+ehcache
+caffeine cache
+guava cache
+
+example of distributed cache
+Redis cache
+Memcached
+Hazelcast
+
+What factors should you consider when deciding whether to use caching in an application?
+read vs write ratio - if reads are more frequent than writes then caching is beneficial
+frequency of data access - how frequently that service is getting called if it is getting called frequently then caching is beneficial
+data consistency requirement - if data get change frequently and required strong consistency then caching is not beneficial
+data size = if data size is large then caching may not be beneficial as it can lead to memory overhead
+concurrency and scalability requirement - if application need to scale horizontally then distributed cache is beneficial
+data type = if static data which not change frequently then caching is beneficial
+user experience requirement - if application need to provide fast response time then caching is beneficial
+data access pattern - caching works well static and predictable data.
+Type of Application:-  Real time, low latency application benefit from caching
+Application where latency is not a concern and it's data access less frequent then caching is not beneficial
+
+
+Comparing Popular Distributed Caching Solutions:
+
+What are the key differences between Redis, Memcached, and Hazelcast?
+When would you favor Redis over Memcached or Hazelcast for a specific use case, and why?
+What are the advantages and disadvantages of Memcached compared to Redis?
+What use cases would make Hazelcast a better choice than Redis or Memcached?
+
+Caching Architecture and Performance:
+
+How does caching help improve application performance and scalability?
+What are the potential risks or downsides of caching in an application?
+What is the difference between write-through caching, write-around caching, and write-back caching?
+
+Implementation of Distributed Cache Using Spring Framework:
+Redis Integration with Spring:
+
+How do you configure a Redis-based cache in a Spring Boot project?
+What are @Cacheable and @CacheEvict annotations in Spring? Provide examples of how these annotations can be used with Redis.
+How does Spring Boot handle serialization for storing data in Redis? How can you customize serialization/deserialization in your Redis cache implementation?
+Hazelcast Integration with Spring:
+
+How do you configure a Hazelcast-based cache in a Spring application?
+Can Hazelcast operate in a peer-to-peer cluster mode? How is this configuration achieved using Spring?
+What are some Hazelcast configuration options to optimize performance in a Spring application?
+
+Practical Scenario Questions:
+
+How would you implement a distributed cache using Redis in Spring Boot to cache results of a database query that frequently changes?
+Describe and implement a caching strategy for a user authentication process using Hazelcast in Spring Boot.
+
+Eviction Strategies and TTL Configuration:
+Eviction Strategy Concepts:
+
+Explain the differences between Least Recently Used (LRU), Least Frequently Used (LFU), and First-In-First-Out (FIFO) eviction strategies.
+In which scenarios is each eviction strategy preferred?
+How can eviction strategies impact performance?
+
+TTL (Time-to-Live) Concepts:
+
+What is TTL in caching, and why is it important?
+How can you configure TTL in Redis and Hazelcast caches?
+Provide an example of how to use custom TTL settings in Spring Boot for Redis.
+What are the potential consequences of setting a TTL value too high or too low?
+
+Practical Scenario Questions on Eviction/TTL:
+
+Given an application with hundreds of microservices generating cache-heavy workloads, what eviction strategy would you use for distributed caching, and why?
+Describe how you would configure dynamic TTL for user session data stored in Redis.
+
+Implementing Local Caching in JVM (On-Heap and Off-Heap):
+Local Caching Concepts:
+
+What is the difference between on-heap and off-heap caching in JVM?
+What are the advantages of using off-heap caching over on-heap caching?
+How do you handle memory overflow in local caching?
+What libraries or tools can you use to implement local caching for a JVM application?
+
+Practical Local Caching Questions:
+
+How would you implement pure on-heap caching in a Java application?
+How would you configure local off-heap caching in a Spring Boot application?
+What techniques can be used to measure and optimize memory usage in local caching?
+
+**Advanced Local Caching:
+
+What is SoftReference and WeakReference in Java? How can they be used for local caching optimizations?
+Describe how you'd handle cache preloading for local caches in JVM.
+Troubleshooting and Optimization:
+Debugging and Monitoring Cache Usage:
+
+How would you monitor and troubleshoot cache performance issues in a distributed system?
+What tools can you use to monitor Redis or Hazelcast cache metrics in real time?
+What strategies can you use to debug TTL or eviction problems in your caching implementation?
+
+Optimization Questions:
+
+What are the most common performance bottlenecks encountered in caching systems, and how do you resolve them?
+How can you reduce cache thrashing or the risk of cache stampede?
+
+Failure Mitigation:
+
+Explain cache poisoning and how you can protect against it in your caching setup.
+How can you design a fallback mechanism for cache miss scenarios?
+What happens when a distributed caching system fails, and how would you mitigate such failures in production?
+
+Practical Exercises:
+Write a simple Spring Boot application that integrates Redis as a cache and uses @Cacheable and @CacheEvict annotations.
+Implement an LRU cache using Java without relying on external libraries (e.g., using a combination of HashMap and LinkedHashSet).
+Compare a distributed caching setup using Redis vs. Hazelcast in terms of scalability, fault tolerance, and throughput under simulated high loads.
+Configure a Hazelcast cluster in a Spring project and demonstrate its peer-to-peer synchronization capabilities.
+Write a TTL-based caching mechanism for cache expiration, demonstrating automatic eviction after configurable time windows.
+Advanced Topics for Senior-Level Preparation:
+
+Caching for Complex Systems:
+How would you design a multi-layered caching mechanism for an e-commerce application (local, distributed, and database query cache)?
+
+How do you handle cache consistency in distributed systems when underlying data changes frequently?
+
+What are the CAP theorem principles applicable to distributed caching? How do caching systems preserve availability and partition tolerance?
+
+These questions and exercises should help you prepare thoroughly for your assessment and provide both theoretical and practical exposure for a senior software role. Focus on creating sample applications and working with real datasets to solidify your understanding

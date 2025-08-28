@@ -1,0 +1,102 @@
+Why shouldn't private methods be tested directly?
+
+Private methods are implementation details and testing them directly makes tests tightly coupled to code structure, reducing maintainability.
+
+How can private methods be validated indirectly?
+Test public methods that rely on private methods. The behavior of the private method will be covered automatically if public methods work as expected.
+
+What should you do if private methods contain very complex logic?
+
+Either refactor the private logic into a separate helper class that is easier to test, or you can use Mockito's partial mock (@Spy) to target specific methods.
+
+Does testing through public methods guarantee correctness of private methods?
+Yes, testing through public methods indirectly validates the logic if its output depends on the private method.
+
+Can Reflection be a valid way to test private methods?
+Reflection breaks encapsulation and should only be used as a last resort when testing legacy code or situations where no alternative is feasible.
+
+What are the drawbacks of using Reflection for testing private methods?
+It can lead to brittle tests that break with code changes, and it violates the principle of encapsulation.
+
+how to test private data members?
+constructor and setter injection to set the value and getter method to get the value.
+reflection to access private data members directly. but not recommended.
+Mockito @Spy to create partial mock and access private data members indirectly.
+
+What is the role of @Transactional in testing and how does it enforce isolation between tests?
+role of @Transactional in testing is it automatically start the transaction before each test method when added on method level and
+rollback for each test method after test execution. which make data consistent in DB.
+as for each test case a new Transaction is created and rollback after test execution. so test data can't get shared which maintain test Isolation.
+we can add @Transactional on class level to apply for all test method in class. but the default behaviour applied to all tests
+but each time new transaction is created for each test method.
+SpringBoot use PlatformTransactionManager to manage transaction in test.
+
+What Best Practice to Follow when writing DB tests?
+Use of In memory database like H2, HSQLDB for faster execution and isolation.
+Use of @Transactional to maintain data consistency and isolation.
+Manually cleanup the db context for External/Non-transactional tests.
+
+How would you set up tests for complex database queries or transactions?
+selection of test database
+    1. in memory database like H2, HSQLDB for Unit test
+    2. Real database for integration test
+    3. TestContainer library to create real instance of DB in container without providing persistent Test database config
+Use Of @Transaction for Test data Isolation and effective roll backing after query  execution.
+Mock external data - if actual call to db method is not required we can mock the db call using Mockito or any other mocking framework.
+User Faker Library to create dynamic test data for complex queries.
+Writes Test case for actual query method to validate the query result.
+Test for edge case such as  null result, empty result and large data set.
+Test for Transaction - test how your application transaction behave does it rollback properly in case of exception.
+and commit properly in multi step operation.
+Test error prone scenario - time out, deadlock, connection failure etc.
+
+What is the difference between @SpringBootTest and @WebMvcTest for REST testing?
+@SpringBootTest - load full application context which gives the access to all layer such as controller, service, repository. used for integration test.
+and we can access any bean in application context.
+@WebMvcTest - it provide minimum feature of application context for ex. web layer support we can call controller objects and write test case on it.
+use for unit tests of controller layer only provide Isolation for testing controller layer.
+
+and for end-to-end test we need to call actual API we can use RestTemplate or WebClient to call actual API.
+
+Best Practice for API testing?
+use MockMvc for flexible programmatic testing.
+use of @WebMvcTest for Isolation of web layer.
+
+How would you validate JSON payloads returned by APIs?
+mockMvc.perform(get("/api/endpoint")).andExpect(status().isOk()).andExpect(jsonPath("$.id").value(1)).andExpect(jsonPath("$.name").value("Test Name"));
+jsonPath expression to validate specific fields in JSON response.
+
+How can you validate nested fields in a JSON response?
+Use jsonPath to traverse nested fields or an object-mapper library like Jackson to deserialize the JSON.
+
+What tools or libraries can you use to validate JSON payloads in Java?
+Spring's MockMvc, JSONAssert, Hamcrest Matchers, Jackson/Gson, Rest Assured.
+
+What is the difference between strict and lenient JSON validation?
+Strict: Exact match, including order and no unexpected fields.
+Lenient: Allows extra fields and is insensitive to field order.
+
+How do you validate arrays in a JSON response?
+Use jsonPath to assert array size, element presence, and exact values.
+
+How would you identify performance bottlenecks in a test scenario?
+large utilization of CPU and memory during test execution.
+Insufficient Connection pool size for DB or API call.
+latency during Large Concurrent Api call.
+check the thread dump using jstack, check heap dump using jmap,  and
+use of profiling tool like VisualVM, YourKit, JProfiler to identify CPU and memory bottleneck.
+What tools or patterns can you use for database or API performance testing?
+use of Jmeter for API testing
+Use of VisualVM and Jprofiler for profiling.
+
+How would you ensure test data consistency in database tests?
+using @Transactional to rollback changes after each test.
+
+Why is dynamic test data more flexible than static fixtures?
+data is generated programmatically at runtime which provide more flexibility and variety of data.
+cover more test scenario. and edge cases.
+scalability to generate large data set for performance testing.
+maintenance free as test data is generated at runtime.
+
+How can you generate dynamic test data in Java?
+using Faker library to generate realistic data.

@@ -1,0 +1,129 @@
+Q1: What is Aspect-Oriented Programming (AOP), and why would you use it?
+it is used to separate cross-cutting concerns from business logic
+the cross-cutting concerns are aspects of application that affect multiple modules.
+which are logging, transaction management, security, error handling
+Q2: What are cross-cutting concerns? Can you provide examples from a real-world project?
+the cross-cutting concerns are aspects of application that affect multiple modules.
+which are logging, transaction management, security, error handling
+
+Q3: How does AOP differ from OOP (Object-Oriented Programming)?
+OOP provide encapsulation, inheritance, abstraction and polymorphism to structure code around objects.
+AOP use for modularizing cross-cutting concerns that used in multiple classes or modules.
+
+Q4: What are the key components of AOP? Explain with examples.
+Aspect - a module where we define advice and pointcut
+Pointcut - a predicate which matches joint point. it defines the place where we want to apply advice or crosscutting concern
+Joint Point - a specific point in program execution( eg. invocation of method and accessing method argument, return type and annotation)
+Advice - action that needs to be perform on defined point cuts.
+
+Q5: Can you explain types of advice in AOP? Provide examples.
+Before Advice - it runs before execution of method.
+After Advice - execute after method execution.
+Around Advice - this is execute before and after method execution. here we use ProceedingJoinPoint to proceed with after execution logic.
+After Returning Advice - if method execution is successful and returns the value then this advice will be executed.
+After Throwing Advice - if method execution throws an exception then we used this advice.
+Q6: What is a pointcut in AOP? How do you define and use pointcuts?
+Point cut - a predicate expression where we want to apply advice or crosscutting concern.
+@Pointcut("exception(* com.example.service.*(..))")
+@Pointcut("within("com.example.service.*)") - class level
+@Pointcut("@within(org.springframework.stereotype.Service)") - class level annotation
+@Pointcut("annotation(@com.example.annotation.Loggable)") - method level annotation
+@Pointcut("args(String, ..)") - method argument
+@Pointcut("@args(com.example.annotation.Loggable)") - method argument annotation
+@Pointcut("target(com.example.service.*)") - target class
+use conditional || and && operator to combine multiple pointcuts
+
+Q6: How does AOP influence performance, and how can it be optimized?
+Runtime weaving Dynamic proxy creation can slower performance.
+making usage of compile time proxy creation using AspectJ needs additional build step but better performance.
+More generic pointcuts can match to multiple joint points which can impact performance.
+creation of Large number of Proxy object during runtime can slow down performance.
+usage of around advice multiple times can impact performance.
+usage of reflection in advice can impact performance.
+recommendation
+use compile time weaving using AspectJ
+create more specific pointcuts which will be applied to the limited joint points where it is required.
+limit the number of advice applied to the methods.
+avoid using around advice multiple times on same method. use simple @before and @after advice.
+minimum reflection usage in advice.
+avoid recursion joint point matching
+if a method in same class call another method which is surrounded by same advice then join point get call recursively which can impact performance.
+so structure pointcut in a way which avoid recursion. and make usage of self-invocation  handling in spring AOP.
+5. Optimize the Number of Aspects- instead of creating multiple aspects for each cross-cutting concern, combine related concerns into a single aspect(logging and performance tracking) to reduce overhead.
+cache the result of advice execution - if same advice is applied to multiple methods with same argument values then cache the result of advice execution to avoid redundant processing.
+Q8: What is the difference between proxy-based AOP and aspect weaving in Spring?
+proxy-based AOP - creates dynamic proxy object(JAVA Dynamic Proxy for class inheriting interface and CGLIB proxy for class which has child but does not implement any interface)  at runtime to apply advice to target object.@EnableAspectJAutoProxy
+aspect weaving -
+compile-time weaving- it uses spring-aop, aspectj-maven- plugin which provide Aspectj compiler to build the proxy as compile time. it incorporate aspect into byte code of target class at compile time.
+load time weaving- it uses aop.xml, spring-aop, aspectj-weaver dependency to weave aspect into class at class load time by JVM
+it also use @EnableLoadTimeWeaving in configuration class to enable load time weaving.
+@Configuration
+@EnableLoadTimeWeaving(aspectjWeaving = EnableLoadTimeWeaving.AspectJWeaving.ENABLED)
+public class AppConfig {
+  // other bean definitions
+}
+or alternative way using aop.xml file in META-INF directory
+AUTODETECT (default) – only weave if aop.xml is present
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:context="http://www.springframework.org/schema/context">
+  <context:load-time-weaver aspectj-weaving="on"/>
+</beans>
+Can you explain the difference between Spring AOP and AspectJ?
+Spring AOP is proxy based AOP framework which is part of spring framework. it support only method level join point and runtime weaving.
+AspectJ is a complete AOP framework which support method level, constructor level, field level join point and support compile time, load time and runtime weaving.
+which is independent of spring framework. and does not require proxy object to apply advice.
+
+Q10: What are the limitations of AOP in Spring?
+it creates proxy object and execute aspect logic at method level only.
+
+How to configure Aspect in Spring
+using @Aspect+@Component annotation
+or if we want to explicitly register bean of aspect class
+then we can use @Configuration class with @Bean method + @EnableAspectJAutoProxy
+
+Q11: Suppose you're tasked with adding logging across multiple services in your application. How would you use AOP to implement this?
+1.define aspect @aspect +@component
+2. define pointcut @Pointcut("execution(* com.example.service.*.*(..))")
+3. @Before and @After advice to log method entry and exit.
+4. usage of JoinPoint in this advice to fetch method name, argument values.
+
+Q12: You need to implement a security feature where every method call in the AdminService must check the user's role before proceeding. How would you do this using AOP?
+1. create a custom annotation @RoleCheck(value="") using @interface provide Target as method level and retention policy as RunTime
+2. define aspect @aspect +@component
+3. define point cut @Pointcut("execution(* com.example.service.AdminService.*(..)) && @annotation(com.example.custom.roleCheck)")
+4. write @Before advise to check user role from security context and compare with required role from annotation value.
+5. use of Joint points to fetch method details if required.
+Q13: How do you ensure exception handling across all service methods in a Spring application using AOP?
+using @AfterThrowing advise to handle exception across all service methods.
+
+Q14: A junior developer on your team overused AOP, applying cross-cutting behavior to non-critical areas. How would you resolve this?
+first audit the usage of AOP in the codebase.
+do performance profiling to see the impact of AOP on performance.
+then identify the non-critical areas where AOP is overused.
+ask junior developer to follow best practices and guidelines for AOP usage.
+ which are
+    use AOP for critical areas only.
+    Consolidate aspect into one aspect if they are related. (logging and performance tracking)
+    define specific pointcuts to limit the scope of advice.
+
+Q15: What are the pitfalls or risks of using AOP?
+create runtime overhead due to proxy object creation.
+complexity in debugging and tracing the code flow.
+increase cost of maintenance due to scattered logic.
+reduce code readability if overused.
+
+Q16: In what scenarios would you not recommend AOP?
+if you need fine-grained control over the execution flow of your application.
+if you don't have critical areas where cross-cutting concerns are needed.
+if you have a small codebase where AOP can add unnecessary complexity.
+
+Q17: How would you handle circular dependencies introduced by AOP?
+by using dependency injection best practices like constructor injection, setter injection with @lazy and use @PostConstruct method to initialize the bean after all dependencies are injected.
+
+Q18: How does compile-time weaving differ from runtime weaving, and which would you prefer?
+if we no there are less critical areas which needs aspect to be written and which will not cause performance overhead if less proxy object
+create run time then use runtime weaving. where we need control on disabling or changing aspect logic at run time
+
+compile time if we know we have large critical area to cover in aspect and need to optimize performance as well and not need of updated aspect logic runtime then we can use
+compile time weaving.
+
