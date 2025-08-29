@@ -1,7 +1,4 @@
-LRU - Least Recent Used. it work on the principle of checking history of usage where the item used very less
-LFU - Least Frequently Used it works on the frequency of item use if it is used more frequently then it will be in cache.
 
-FIFO - First In First Out it works on the principle of removing the item which is added first in cache.
 
 Here is a list of questions to help you prepare for the level-up assessment for a senior software role with a focus on caching solutions. These questions cover theoretical concepts, practical knowledge, and implementation with the libraries/frameworks you mentioned.
 
@@ -9,6 +6,7 @@ Distributed and Local Caching Foundations:
 General Questions on Caching:
 
 What is caching, and why is it important in distributed systems?
+
 caching is used to cache the static and most frequently used data which get change less frequently.
 which improve application performance and response time.
 it is important in distributed system because of fallowing
@@ -107,74 +105,216 @@ Caching Architecture and Performance:
 
 How does caching help improve application performance and scalability?
 What are the potential risks or downsides of caching in an application?
+
 What is the difference between write-through caching, write-around caching, and write-back caching?
+write through cache-
+data is updated in both cache and underline resource sequentially.
+whenever data is update it is update in cache first and then immediately update in underline resource.
+it maintain data consistency between cache and underline resource. both cache and underline resource are in sync.
+advantage
+fast reads are there as cache is always updated
+have data consistency between cache and underline resource
+disadvantage
+Particularly slow writes- as each time cache needs to update first and underline resource get update. which slow write
+operation.
+Higher DataBase load:- each time write happen if there are multiple writes then cache update happen and cache need to update
+database each time which can add overhead on database.
+Example use case
+Session storage= session storage. session data must be consistent across multiple server
+Critical System = system which need strong consistency between cache and underline resource
+in ecommerce website if product stock is updated then it should be consistent across all server
+
+write around cache
+it first write to underlying resource and cache get updated only when get call happen
+at time of gate call if entry not present in cache call goes to db or any resource to fetch the data.
+data that is getting access frequently that will get store in cache. data which get access less frequently may not
+get added into cache
+Advantage
+Writes are faster - as write happen directly to underline resource so write operation is fast
+Reduce cache churn - data that is less frequently access may not get store in cache which save cache memory from
+utilization
+Disadvantage
+Frequent Cash Miss - for get call if data is not present in cache then frequent cache miss will happen which eventually slower the
+read performance
+Data Inconsistency - As less frequently access data may not be cached. this create inconsistency between cache and underline resource
+can have stale data in cache
+Example use case
+Written Intensive application - where frequent write operation happen and read operation is less frequent
+Cost-effective cache - system where caching less frequently access data is not very desirable choice in case of performance
+and cost optimization.
+
+write back cache
+it first write to cache and later asynchronously write to underlying resource after some interval(using flushing mechanism. when cache evict happen)
+instead of write multiple time for same data in underlying resource it write the state changes of same data in cache and the consolidate it. and asynchronously
+write to underlying resource.
+Advantage
+Faster writes -as writes are happen to cache first and then they are consolidate to one write and write to underlying resource
+asynchronously
+reduce load on underlying resource - as multiple writes from cache consolidated in one and the write to db so less write perform on db
+which reduce load on it
+Disadvantage-
+    data loss can happen - if cache get crash before writing to db then data loss can happen
+    complexity - required addition mechanism to maintain data consistency between cache and underline resource
+    handling failures or flushing of data to underline resource
+    Example:-
+    write heavy workload - system with frequent updates and writes are very critical
+    Analytics system - system where eventual consistency required and write to db asynchronously is acceptable
+    use case
+    a game Leaderboard system - where frequent score updates happen and eventual consistency is acceptable
 
 Implementation of Distributed Cache Using Spring Framework:
 Redis Integration with Spring:
 
 How do you configure a Redis-based cache in a Spring Boot project?
+use dependencies
+spring-boot-starter-cache - cache annotation support
+spring-boot-starter-data-redis - redis server connection
+io.lettuce.core - redis client
+@EnableCaching on spring Boot Application
+In appconfig class
+create RedisConnection Factory bean(return new LettuceConnectionFactory()) - to create connection with redis server
+RedisTemplate - for setting connectFactory and setting Key and value serializer
+for key StringRedisSerializer
+for Value GenericJackson2JsonRedisSerializer
+in app.yml
+spring.data.redis.host=localhost
+spring.data.redis.port=6379
+spring.data.redis.password=yourpassword(if any)
+spring.data.redis.connection-timeout=2000
+use of
+@Cacheable- which load data from cache if present otherwise call goes to actual method or resource
+@CachePut - it is used to update cache data when ever call made to method.
+@CacheEvict - clear cache.
+
 What are @Cacheable and @CacheEvict annotations in Spring? Provide examples of how these annotations can be used with Redis.
 How does Spring Boot handle serialization for storing data in Redis? How can you customize serialization/deserialization in your Redis cache implementation?
-Hazelcast Integration with Spring:
-
-How do you configure a Hazelcast-based cache in a Spring application?
-Can Hazelcast operate in a peer-to-peer cluster mode? How is this configuration achieved using Spring?
-What are some Hazelcast configuration options to optimize performance in a Spring application?
 
 Practical Scenario Questions:
 
 How would you implement a distributed cache using Redis in Spring Boot to cache results of a database query that frequently changes?
-Describe and implement a caching strategy for a user authentication process using Hazelcast in Spring Boot.
+
 
 Eviction Strategies and TTL Configuration:
 Eviction Strategy Concepts:
 
 Explain the differences between Least Recently Used (LRU), Least Frequently Used (LFU), and First-In-First-Out (FIFO) eviction strategies.
+LRU - first it prioritize cache data based on order of usage and evict data accordingly.
+the cache data which used not used recently will be evicted from cache first.
+use case webpage caching, session storage.
+LFU - LeastFrequentlyUsed it prioritize cache data based on count of usage and evict data accordingly.
+meaning data which is less frequently access get remove first
+use case content recommendation system, database
+FIFO - FirstInFirstOut it prioritize cache data based on order of addition in cache and evict data accordingly.
+use case queue mechanism, simple static data caching
+
 In which scenarios is each eviction strategy preferred?
+if you want to cache simple static data we can use FIFO strategy. provide simple queue mechanism to evict data.
+if you want cache should be prioritize on order of usage then Least strategy is preferred. suppose
+you want to clear the session from cache which is used recently then we can use
+if we want to prioritize the cache based on count of cached data access then we can use LFU strategy.
+product catalog is frequently accessed by multiple user
+
 How can eviction strategies impact performance?
+if we not use correct eviction strategy then it can lead to cache thrashing
+which creat lot of cache miss and ultimately degrade performance
 
-TTL (Time-to-Live) Concepts:
 
-What is TTL in caching, and why is it important?
-How can you configure TTL in Redis and Hazelcast caches?
-Provide an example of how to use custom TTL settings in Spring Boot for Redis.
-What are the potential consequences of setting a TTL value too high or too low?
+
 
 Practical Scenario Questions on Eviction/TTL:
 
 Given an application with hundreds of microservices generating cache-heavy workloads, what eviction strategy would you use for distributed caching, and why?
+lets take example of ecommerce product catalog is frequently accessed by multiple user
+so we need to use Least frequently use strategy because product catalog is frequently accessed by multiple user
+here we need to count the usage of cache data and prioritize accordingly
+suppose we need to cache some static data such product images we can use fifo strategy idle for simple static data
+suppose we need to cache user session data which get change frequently and need to be evict after some time least recently use strategy is preferred
 Describe how you would configure dynamic TTL for user session data stored in Redis.
+we can use redis set command to dynamically set ttl
+redisTemplate.opsForValue().set("sessionKey", sessionData, Duration.ofMinutes(30));
 
 Implementing Local Caching in JVM (On-Heap and Off-Heap):
 Local Caching Concepts:
 
 What is the difference between on-heap and off-heap caching in JVM?
+on-heap caching - store cache data in java heap memory basically use JAVA heap memory for caching.
+Advantages: Fast in reads as it is inside JVM memory
+Simple implementation as it use JVM memory no extract configuration required
+Disadvantages -
+can't have large data to cache in JVM due small in size of heap memory
+Garbage collection overhead - as cache reside in heap memory it can add overhead on garbage collection process
+
+Off-heap caching - store cache outside the JVM memory meaning on shared memory or direct memory(os memory) or filesystem
+Advantages
+large cache size compare to on-heap memory can store large data
+garbage collection overhead is removed here
+Disadvantage
+    provide little bit more latency compare to on-heap
+    need additional configuration to setup off-heap cache
 What are the advantages of using off-heap caching over on-heap caching?
+provide large caching size and avoid garbage collection overhead
 How do you handle memory overflow in local caching?
 What libraries or tools can you use to implement local caching for a JVM application?
+ on heap caching- concurrentHasMap, hazelcast, ehcache, caffeine cache, guava cache
+ off-heap caching - ehcache(need to explicitly configure off-heap), caffeine cache(need to explicitly configure off-heap)
 
 Practical Local Caching Questions:
 
 How would you implement pure on-heap caching in a Java application?
+using concurrentHashMap or ehcache or caffeine cache or guava cache
 How would you configure local off-heap caching in a Spring Boot application?
+using ehcache(explicitly configure off-heap in ehcache.xml) or caffeine cache(explicitly configure off-heap in app config class)
 What techniques can be used to measure and optimize memory usage in local caching?
+use of monitoring tools like JMX, Micrometer, VisualVM
+
+key concept to take in consideration choosing on-heap and off-heap caching
+
+cache use and performance-
+eviction policy- selection of proper eviction policy is important to avoid cache thrashing and improve performance
+concurrency - if multiple thread access cache concurrently then need to use concurrent data structure like concurrentHashMap
+JVM tuning - for on-heap caching need to tune JVM heap memory size and garbage collection parameters
+Monitoring - need to monitor cache usage and cache eviction metrics to optimize cache performance by using tool like
+JMX, Micrometer.
+
 
 **Advanced Local Caching:
 
 What is SoftReference and WeakReference in Java? How can they be used for local caching optimizations?
-Describe how you'd handle cache preloading for local caches in JVM.
+it is used in on-heap caching to avoid memory overflow issue.
+softReference - it is  remove by garbage collector when there is JVM full I we need to free up memory
+weekReference - whenever garbage collector thread runs weakReference object are deleted from JVM.
+
+
+
+
 Troubleshooting and Optimization:
 Debugging and Monitoring Cache Usage:
 
 How would you monitor and troubleshoot cache performance issues in a distributed system?
+elk metrics
+elk logs
+metrics monitoring tool like prometheus, grafana
 What tools can you use to monitor Redis or Hazelcast cache metrics in real time?
+redis cli
+elk
+matrix monitoring tool
+
+
+
+// this all question should be skipped
+//skip
 What strategies can you use to debug TTL or eviction problems in your caching implementation?
+
+//skip
+Describe how you'd handle cache preloading for local caches in JVM.
 
 Optimization Questions:
 
 What are the most common performance bottlenecks encountered in caching systems, and how do you resolve them?
+
 How can you reduce cache thrashing or the risk of cache stampede?
 
+//skip
 Failure Mitigation:
 
 Explain cache poisoning and how you can protect against it in your caching setup.
@@ -197,3 +337,18 @@ How do you handle cache consistency in distributed systems when underlying data 
 What are the CAP theorem principles applicable to distributed caching? How do caching systems preserve availability and partition tolerance?
 
 These questions and exercises should help you prepare thoroughly for your assessment and provide both theoretical and practical exposure for a senior software role. Focus on creating sample applications and working with real datasets to solidify your understanding
+//need to skip
+Hazelcast Integration with Spring:
+
+How do you configure a Hazelcast-based cache in a Spring application?
+Can Hazelcast operate in a peer-to-peer cluster mode? How is this configuration achieved using Spring?
+What are some Hazelcast configuration options to optimize performance in a Spring application?
+Describe and implement a caching strategy for a user authentication process using Hazelcast in Spring Boot.
+
+//skip
+TTL (Time-to-Live) Concepts:
+
+What is TTL in caching, and why is it important?
+How can you configure TTL in Redis and Hazelcast caches?
+Provide an example of how to use custom TTL settings in Spring Boot for Redis.
+What are the potential consequences of setting a TTL value too high or too low?
