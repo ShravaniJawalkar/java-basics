@@ -224,6 +224,7 @@ which creat lot of cache miss and ultimately degrade performance
 Practical Scenario Questions on Eviction/TTL:
 
 Given an application with hundreds of microservices generating cache-heavy workloads, what eviction strategy would you use for distributed caching, and why?
+LRU and LFU strategy is preferred for microservice architecture
 lets take example of ecommerce product catalog is frequently accessed by multiple user
 so we need to use Least frequently use strategy because product catalog is frequently accessed by multiple user
 here we need to count the usage of cache data and prioritize accordingly
@@ -261,9 +262,20 @@ What libraries or tools can you use to implement local caching for a JVM applica
 Practical Local Caching Questions:
 
 How would you implement pure on-heap caching in a Java application?
-using concurrentHashMap or ehcache or caffeine cache or guava cache
+using concurrentHashMap or ehcache or caffeine cache or guava cache.
+
 How would you configure local off-heap caching in a Spring Boot application?
-using ehcache(explicitly configure off-heap in ehcache.xml) or caffeine cache(explicitly configure off-heap in app config class)
+need to add org.ehcache dependency, spring boot starter data cache dependency, spring boot starter spring context support dependency
+@EnableCaching on @SpringBootApplication class
+I configured ehcache programmatically in app config class
+Create EhcCacheProvider bean using Caching.getCachingProvider()(type EhcacheCachingProvider)
+create a CachingConfiguration object and add ResoucePoolsBuilder.newResourcePoolsBuilde().offHeap(100,MemoryUnit.MB) to it.
+then create Configuration object of Ehcache and set cacheConfiguration object to it with cache name.
+create CacheManager bean and initialize it with above configuration object.
+then return new JcacheCacheManager(cacheManager) from CacheManager bean method.
+then use Spring cache annotation such as @cacheable, @CacheEvict, @CachePut on service method to use cache.
+
+
 What techniques can be used to measure and optimize memory usage in local caching?
 use of monitoring tools like JMX, Micrometer, VisualVM
 
@@ -300,6 +312,18 @@ elk
 matrix monitoring tool
 
 
+eviction policy of
+Redis - by default its none
+we can configure it
+volatile-lru - keys with ttl which are least recently used are evicted first
+allkey-lru - keys irrespective off ttl which are least recently used are evicted first
+volatile-lfu - keys with ttl which are least frequently used are evicted first
+allkey-lfu - keys irrespective off ttl which are least frequently used are evicted first
+volatile-random - keys with ttl are evicted randomly
+allkey-random - keys irrespective off ttl are evicted randomly
+
+Memcached - by default it support LRU eviction policy
+Hazelcast by default none but after configuration it support LRU and LFU eviction policy
 
 // this all question should be skipped
 //skip

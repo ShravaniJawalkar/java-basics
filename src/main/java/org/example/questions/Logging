@@ -1,0 +1,86 @@
+Here’s a categorized list of potential interview questions:
+
+Basic Questions:
+What is logging, and why is it important in application development?
+logging is used to record message and event when an application is running
+message have details like error, warning, system performance, information details of application state.
+logging framework help developer to write standard log message with structure data and output it on console and file
+according to configuration
+Benefits of logging
+
+debugging and troubleshooting
+    it help developer to find root cause of issue. by logging error and exception with stack trace
+
+Monitoring and observability
+it helps deveOps engineer to monitor application health and performance by logging metrics and events
+
+Audit and compliance
+useful for auditing sensitive actions(login attempt, payment processing) and maintaining compliance with regulations
+in compliance strict environment logging is must
+Performance analysis
+it  logs time information of actions. ex. the time required to execute db query.
+time taken for response from external api
+service communication tracing
+in distributed system. logging help to trace full request flow(how request get process from different service) with help of correlation id
+
+Production incident investigation
+in production incident investigation. logging plays important role.
+it help to faster Identify root cause and immediate action to resolve issue
+
+Security monitoring
+it help in tracking malicious activity and unintended login attempts and we can monitor ang generates alerts due to this information
+
+characteristics of good logging and best practices
+
+Structured logging data : use Json format for logging the log message for better parsing and analysis
+helps to integrate easily with centralized logging system like elk, splunk.
+
+Logging level: INFO, DEBUG, ERROR, WARN, TRACE
+use of proper logging level to log message is very important. in development use debug level to log detailed information.
+in production use info error and warn level to log important information
+
+Centralization:- consolidate logs from different service in distributed environment into centralize application like elk
+for effective monitoring and analysis
+Tracing and correlation id:-
+in distributed system correlation id help to trace a full request flow across different service
+Retention policy:- retain the log for specific time period as per compliance and business need
+avoid logging sensitive data
+
+What are the differences between System.out.println and a proper logging framework?
+"Feature",        "System.out.println","Logging Framework"
+"Logging Levels",        "No",          "Yes (e.g., DEBUG, INFO, ERROR)"
+"Output Destination",   "Console only",     "Console, files, streams, remote servers"
+"Configuration",       "Hardcoded",        "Dynamic via configuration files"
+"Performance",        "Blocking, poor for production",  "Optimized, supports async logging"
+"Contextual Information (e.g., MDC)","Manual inclusion",  "Automatic, supports MDC/NDC"
+"Scalability",         "Limited",                                 "Designed for large-scale systems"
+"Stack Trace Logging",            "Manual formatting",         "Automatic formatting"
+"Error Handling",         "Difficult",                         "Flexible and structured"
+
+How do you configure java.util.logging in Java?
+What are logging levels? Can you name common levels provided by logging frameworks? (INFO, DEBUG, ERROR, etc.)
+Intermediate Questions:
+What is SLF4J, and how does it differ from Log4j or Logback?
+Describe the concept of appends in logging frameworks like Logback or Log4j.
+How do configuration files (e.g., XML or JSON) control logging behavior in Log4j or Logback?
+How do you implement rolling logs in Logback or Log4j, and why is it useful?
+What are MDC (Mapped Diagnostic Context) and NDC (Nested Diagnostic Context) in SLF4J or Logback? How are they used?
+Advanced Questions:
+What is asynchronous logging, and why is it beneficial? Which frameworks support it?
+How would you configure SLF4J to work with Log4j or Logback in a Java application?
+Compare Log4j 1.x vs. Log4j 2. Why should developers migrate to Log4j 2?
+Explain the Log4Shell vulnerability. How can it be mitigated in Log4j?
+What's the difference between a logging facade (like SLF4J) and a logging framework (like Logback)?
+How would you dynamically change logging levels in a production environment without restarting the application?
+Use Case or Scenario-based Questions:
+If your application writes volume-heavy logs, how would you optimize its performance?
+How would you implement different loggers for different modules or packages in a Java application?
+A production system generates logs that are too noisy (large volume); what strategies would you propose to improve logging efficiency?
+How would you implement centralized logging in a distributed microservices-based system?
+You need to integrate an external library that uses java.util.logging, but your application uses SLF4J. How would you handle this?
+Hands-On or Code-Oriented Questions:
+Write a simple Java program using SLF4J with Logback as the logging backend.
+Implement a custom appender for a logging framework (e.g., Log4j or Logback).
+Demonstrate how to use MDC (Mapped Diagnostic Context) to enrich logs with contextual information like user ID.
+Show how you would configure rolling file logs in either Log4j or Logback.
+Create a JSON configuration for Log4j to log ERROR messages to a file and DEBUG messages to the console.
