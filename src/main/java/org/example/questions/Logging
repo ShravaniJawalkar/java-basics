@@ -323,9 +323,83 @@ in logback.xml
 A production system generates logs that are too noisy (large volume); what strategies would you propose to improve logging efficiency?
 How would you implement centralized logging in a distributed microservices-based system?
 You need to integrate an external library that uses java.util.logging, but your application uses SLF4J. How would you handle this?
+using Jul-to-slf4j bridging library to route java.util.logging calls to slf4j
+<dependency>
+    <groupId>org.slf4j</groupId>
+    <artifactId>jul-to-slf4j</artifactId>
+    <version>1.7.36</version> <!-- Use the latest version -->
+</dependency>
+Redirecting the log to slf4j
+remove existing handlers from root logger
+LogManager.getLogManager().reset();
+Slf4jBridgeHandler.install();
+and add slf4j-api and underlying implementation(logback or log4j) dependency
+and configure custom handler through logging.properties or can use logback.xml or log4j2.xml
+
 Hands-On or Code-Oriented Questions:
 Write a simple Java program using SLF4J with Logback as the logging backend.
+add dependencies slf4j-api and logback-classic
+add logback.xml in resources folder add appender and logger
+add LoggerFactory.getLogger in java class to log message
+
 Implement a custom appender for a logging framework (e.g., Log4j or Logback).
+in logback extend AppenderBase<ILogEventFactory> which has append(ILogEvent event) method
+and define that custom appender in logback.xml
+<appender name="custom" class="org.exampleappenderconfig.CustomAppender">
+    </appender>
+
+    in log4j2
+    extend AbstracAppender in class and provide constructor which call supper class constructor
+    add abstract method append(LogEvent event) annotate class with
+    @Plugin(
+    name="CustomAppender",
+    category=Core.CATEGORY_NAME,
+    elementType=Appender.ELEMENT_TYPE,
+    printObject=true
+    )
+    need to create a Builder class for pluginAttributes name,ignoreExceptions, layout, filter and override build() method
+    annotate all files with @PluginBuilderAttribute and to show element in xml use @PluginElement
+    create method and annotate it with @PluginBuilderFactory which return Builder object
+    define that custom appender in log4j2.xml
+    <CustomAppender name="CustomAppender">
+    <"PluginElement">
+    </CustomAppender>
+
+
 Demonstrate how to use MDC (Mapped Diagnostic Context) to enrich logs with contextual information like user ID.
+mdc.put("userID", "12345"); in java class before logging the message
+in log pattern configuration use [%x{userID}] to display user id in log message
+
 Show how you would configure rolling file logs in either Log4j or Logback.
+logback.xml
+<appender name="RollingFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
+<file>logs/app.log</file>
+<fileNamePattern>logs/app-%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
+<rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+    <maxFileSize>10MB</maxFileSize>
+    <maxHistory>30</maxHistory>
+    <totalSizeCap>3GB</totalSizeCap></rollingPolicy>
+    <encoder>
+        <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern></encoder>
+</appender>
+log4j2.xml
+<RollingFile name="RollingFile" fileName="logs/app.log" filePattern="logs/app-%d{yyyy-MM-dd}-%i.log.gz">
+    <PatternLayout>
+        <pattern>%d{yyyy-MM-dd HH:mm:ss} [%t] %-5level %c{1} - %msg%n</pattern></PatternLayout>
+        <Policies>
+        <SizeBasedTriggeringPolicy size="10MB"/>
+        <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+        </Policies>
+    <DefaultRolloverStrategy max="30"/>
+    </RollingFile>
 Create a JSON configuration for Log4j to log ERROR messages to a file and DEBUG messages to the console.
+inside append we can add filter which has property onMatch and onMismatch
+
+
+I have implemented log4j2 logging framework with backward compatibility of log4j1.x in servlet based web application.
+
+there I used bridging jar
+log4j-1.2.api-2.17.1.jar-provide backward compatibility of log4j1.x api
+log4j-core-2.17.1.jar-log4j core implementation
+log4j-api-2.17.1.jar-log4j api
+and did configuration in log4j2.xml file with async appender for better performance

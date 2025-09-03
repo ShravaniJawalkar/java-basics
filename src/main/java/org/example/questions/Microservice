@@ -136,13 +136,13 @@ eureka discovery
     eureka.client.availability-zones.default=default
     eureka.client.service-url.defaultZone=http://localhost:8761/eureka/
     eureka.client.healthcheck.enabled=true
-    eureka.client.lease-expiration-duration-in-seconds=30
+    eureka.client.lease-expiration-duration-in-seconds=90
     for client
     spring-cloud-starter-netflix-eureka-client
       eureka.client.register-with-eureka= true
       eureka.client.fetch-registry=true
       eureka.client.service-url.defaultZone=http://localhost:8761/eureka/
-      eureka.client.lease-renewal-interval-in-seconds=10
+      eureka.client.lease-renewal-interval-in-seconds=30
 Api Gateway
 for async
 spring-cloud-starter-gateway-webflux
