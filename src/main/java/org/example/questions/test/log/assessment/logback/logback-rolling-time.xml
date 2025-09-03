@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Configuration status="WARN">
+    <appender name="RollingFileAppender" class="ch.qos.logback.rolling.RollingFileAppender">
+        <File>logs/app.log</File>
+        <rollingPolicy class="ch.qos.logback.rolling.TimeBasedRollingPolicy">
+            <FilePattern>logs/app.%d{yyyy-MM-dd}.log</FilePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+    <root level="INFO">
+        <appender-ref ref="RollingFileAppender"/>
+    </root>
+    <logger name="org.example.questions.test.log.assessment" level="DEBUG" additivity="false">
+        <appender-ref ref="RollingFileAppender"/></logger>
+</Configuration>

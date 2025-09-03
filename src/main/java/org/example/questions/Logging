@@ -58,23 +58,268 @@ What are the differences between System.out.println and a proper logging framewo
 "Error Handling",         "Difficult",                         "Flexible and structured"
 
 How do you configure java.util.logging in Java?
+logging.properties file
+.level= INFO
+handlers = java.util.logging.ConsoleHandler, java.util.logging.FileHandler
+each handler level formater = java.util.logging.SimpleFormatter format,
+for files
+append=true, limit=50000,count=1, pattern = %h/java%u.log(file path).
+InputStream is = LogConfig.class.getClassLoader().getResourceAsStream("logging.properties");
+LogManager.getLogManager().readConfiguration(is);
+Logger log= Logger.getLogger("org.example");
+
+what is advantage and drawback of java.util.logging
+it is a builtin framework provided by jdk for logging support logging levels.
+
+Advantages are:
+Built in Framework: no need to add external dependency
+customizable: it provide console and file handler with different formatter
+flexible configuration: support both programmatic and file based configuration
+Disadvantages:
+does not support advance feature like other framework(log4j, logback asynchronous logging, mdc,ndc)
+poor performance compare to other framework and not suitable for high volume logging
+only support logging.properties file for configuration which is less readable and cumbersome for complex configuration
+
 What are logging levels? Can you name common levels provided by logging frameworks? (INFO, DEBUG, ERROR, etc.)
+logging levels are the severity and priority of log message. it helps developer and operational team to control which
+message to record and display. it help to separate debug messages from error and  warning messages.
+different logging levels
+TRACE: 1st level. Provide Most Granular level information about application(detail debugging info).
+include info like application flow, variable value and method entry/exit.
+DEBUG: 2nd level. it contain development level information which helps to debug application.
+includes info like business logic flow and intermediate state.
+INFO: define general information of application Include information of normal execution of
+application like startup/shutdown, configuration setting, connection status.
+WARN: define sever unintended and problematic issues which does not disturb application flow.
+info include cache miss and disk almost full.
+ERROR: used to define Sever failure which disturb program flow ex. Unhandled Exception. DB connection failure.
+FATAL: Highest Level of logging. Define critical failures such as System crash and data corruption.
+
 Intermediate Questions:
 What is SLF4J, and how does it differ from Log4j or Logback?
+Slf4j is a abstraction layer a facade used on top of log4j and logback.
+it is standard protocol or api which and be used to implement any logging framework at low level.
+support different logging framework log4j, logback, java.util.logging
+provide adaptor support of older log4j version 1.x
+use string placeholder {} for parameterized logging
+
 Describe the concept of appends in logging frameworks like Logback or Log4j.
+Appends helps to log the message to different destination as mentioned in configuration file.
+
+logger record the message as per level
+fort the log message and pass it to appender
+appender is responsible for sending and storing that log message to destination.
+
+Types of appender
+Console Appender:- log the message on console
+File appender:- append the log message in destination file.
+Rolling File Appender:- log the message in file and create new file for logging message if specific condition met(ex. size or interval)
+SocketAppender:- log the message on Remote server using TCP/UDP
+AsyncAppender:- Buffer log in the memory before passing log asynchronously to another appender
+JDBAppender:- log the message to DB using JDBC connection
+SyslogAppender:- log message to SysLog server(used in Linux/Unix)
+KafkaAppender:- log the message on Kafka topic.
+Custom Appender:- if any of appender doesn't solve the requirement can create custom appender.
+
 How do configuration files (e.g., XML or JSON) control logging behavior in Log4j or Logback?
+configuration helps to define logging level, formatter, appender, filter, logger for different package or class.
+rolling policy for log file.. as it is outside the code any changes done in this does not require code change and redeployment
+we can configure this file using json,xml or yml in lo4j and xml or groovy in logback.
 How do you implement rolling logs in Logback or Log4j, and why is it useful?
+using timeBasedRollingPolicy or sizeBasedTriggeringPolicy in logback
+why it is used
+File size management:- reducing the usage of disk space by dividing the long log file into small chunks
+Retention and Rotation- we can limit the number of files to keep to cleanup old logs
+Easier Log Analysis:- as file is divide int to small chunk with filename_date_time.log it is easier to analyze the logs
+Performance- instead of appending logs to long log file it is easy to log into small file which improve performance.
+
+difference in rolling policies of log4j and logback
+log4j - configuration of xml , json and yml and .properties
+logback - configuration of xml and groovy
+combine rolling policy
+log4j- time based and size based
+logback- sizeAndTimeBasedFNTP
+gzip support
+log4j- native support
+logback- not provided need to use external library.
+
+if need to combine with Slf4j
+logback- logback-classic, slf4j-api
+log4j- log4j-core, log4j-api, log4j-slf4j-impl, slf4j-api
+alone
+logback- logback-classic
+log4j- log4j-core, log4j-api.
+
+
 What are MDC (Mapped Diagnostic Context) and NDC (Nested Diagnostic Context) in SLF4J or Logback? How are they used?
+it both used to enrich log message with contextual information runtime.
+MDC:- Map Diagnostic context used to store contextual information in key value pair dynamically. which can logger read runtime and we can
+add placeholder to load that info in log message.
+MDC is unique for each thread and contextual info store in MDC of one's thread is not available to another thread.
+that's why it is helpful in multi threading as well as a distributed system to trace full request flow with correlation id.
+
+Key Benefit of MDC
+1. Improve Traceability:- we can add user id , session Id , request which
+improve traceability of log message in distributed system.
+such as  user id, transaction id, Span Id, Session Id, request id.
+2. Thread Specific Context:- as MDC is thread specific it is useful in multithreading environment
+3. Easy of use:- we just need to use mdc.put("key","value") to add the context and use %X{key} in log pattern to display that value
+4. Dynamic metadata:- we can add or remove metadata at runtime as per requirement
+
+NDC:- Nested Diagnostic Context, it is stack based structure to store nested contextual information.
+Nested information is pushed to stack when a method is entered and popped when method is exited.
+unlike MDC support key value pair, NDC only support stack based string value. just push and pop string value.
+CAll Hierarchy tracking- Ideal for tracking nested structure like method call hierarchy.
+Dynamic Stack Management- push and pop method to manage stack dynamically.
+Simplified Contextual Logging- Eliminates the need for key-value pair, while tracking in depth information.
+
+
+
 Advanced Questions:
 What is asynchronous logging, and why is it beneficial? Which frameworks support it?
+asynchronous logging the background thread is used to log messages to destination.
+in asynchronous logging application thread logs the message to the queue(buffer in memory) and background thread
+consume these messages and log to destination.
+key benefits:-
+Improve performance:- as application thread is not blocked during logging it improve application performance
+by serving request faster.
+Enhance Scalability:- as the logs are written asynchronously. log bottleneck is reduce which improve system throughput
+by serving multiple concurrent request.
+Reduce Latency:- synchronous logging take times to log to slow destination like file, db, remote server.
+with help of asynchronous logging application thread is free from logging to the destination. background thread does the work
+which reduce latency.
+Enable Batch process:- bulk message logging can be done with Async logging which improve performance.
+Easily integrate with Aggregation system:- in distributed environment. Asynchronous logging help to integrate logs to centralize system such as elk, splunk
+
+Log4j2 support asyncAppender and AsyncLogger
+Logback support AsyncAppender
+slf4j is facade it support async logging if underlying framework support it.
+
 How would you configure SLF4J to work with Log4j or Logback in a Java application?
+to integrate slf4j with log4j in java application I need to add below dependencies
+log4j-core, log4j-api, log4j-slf4j-impl, slf4j-api
+log4j2.xml for configuring logging level, loggers, appender and filters for filtering message to specific appender
+logback-
+logback-classic, slf4j-api
+logback.xml for configuring logging level, loggers, appender and filters for filtering message to specific appender
+
 Compare Log4j 1.x vs. Log4j 2. Why should developers migrate to Log4j 2?
+asynchronous logging support
+Log4j2:- support async logging AsyncAppender and AsyncLogger
+lo4j1= synchronous and blocking.
+configuration
+log4j2- support xm, yml json and properties file
+log4j1= xml and .properties file
+lazy logging=
+log4j2 use string placeholder {} for parameterized logging
+log4j1:- need to manually concatenate the string
+Api compatibility
+log4j2- support slf4j and java.util.logging(using bridge)
+log4j1:- support log4j specific api.
+MDC and NDC=
+log4j2= support MDC(map per thread) and NDC is removed
+log4j1=support both MDC and NDC
+plugin support
+log4j2= yes support custom plugin for appender, layout, filter
+log4j1= no support
+Rotation policy
+log4j2= has builtin Rolling policies time based and size based
+log4j1:- no builtin support need to use external library(DailyRollingFileAppender)
+Performance Scalability:-
+log4j1 = is single threaded and blocking so less performance
+log4j2= design for high throughput, scale better in multi threaded environment
+Garbage Free Logging:-
+log4j1= it is not garbage free logging generate unnecessary object(string objects for formating)
+log4j2= support garbage free logging with use of string placeholder {}
+Security:
+log4j1= has some vulnerability related to JMS appender,SocketAppender,SMTPAppender.
+log4j2= mitigate all vulnerability of log4j1 and has better security feature.
+
+
 Explain the Log4Shell vulnerability. How can it be mitigated in Log4j?
+log4jShell is a vulnerability which exploits the log4j ability to perform runtime lookup using JNDI API.
+JNDI lookup is used to connect to external server such as LDAP, RMI server. this allow the attacker to inject malicious code to log which could execute
+arbitrary code on vulnerable system.
+the steps how attack occur
+Attacker inject user input(HTTP header, Query Parameter and form field) it inject user input in log message
+Logger intercept the log :- it log the message and if it found JNDI it will do JNDI lookup.
+External server Response:- JNDI lookup allow application server to connect to Attackers server using JNDI(LDAP , RMI)
+the attacker send the malicious response in return
+Remote Code execution:- this malicious response run arbitrary code on vulnerable system.
+Impact of log4jShell
+Remote code execution:- execution of arbitrary code on compromised system
+Data Exhilaration:- sensitive data can be stolen by attacker.
+it's mitigation given in
+log4j2.17.1 for java8
+log4j2.12.3 for java7
+log4j2.3.2 for java6
+JNDI lookup disable in log4j2.15.0
+support for JNDI lookup is completely removed in log4j2.16
+and provided additional security layer for other vulnerability in log4j2.17.0
+
 What's the difference between a logging facade (like SLF4J) and a logging framework (like Logback)?
+slf4j is facade or abstraction layer above any logging framework logback is actual implementation
+slf4j does not configure appender and loggers it redirect this configuration to underline implementation
+logback can do configuration using xml and groovy
+slf4j performance depends on underlying implementation
+logback is faster than log4j1 and java.util.logging. provide asynchronous logging.
+scalability- for slf4j again is depend on underlying implementation
+logback - is design for high throughput system, built in feature to handle large concurrent request
+slf4j provide string placeholder {} for parameterized logging.
+logback also support this feature
+
 How would you dynamically change logging levels in a production environment without restarting the application?
+programmatic way
+log4j2
+Configurator.setLevel("com.example", Level.DEBUG);
+logback
+Logger logger= (ch.qos.logback.classic.Logger) LoggerFactory.getLogger("com.example");
+logger.setLevel(Level.DEBUG);
+Java.util.logging
+logger.setLevel(Level.FINE);
+
+configuration in logback.xml or log4j2.xml
+log4j2.xml - setting monitorInterval(in seconds) attribute in configuration tag
+logback.xml - setting scan=true and scanPeriod="30 seconds" in configuration tag
+
+using Java Management Extensions(JMX)
+JMX provide standard way to manage and monitor application at runtime.
+Rest API Endpoint
+creating rest endpoint to update logging level runtime for secure access we can use authentication and authorization.
+
 Use Case or Scenario-based Questions:
 If your application writes volume-heavy logs, how would you optimize its performance?
+use of Async logging to reduce the blocking of application thread
+use of Batch logging to log multiple message in one go using AsyncAppender or BufferAppender
+changing logging level from DEBUG or TRACE to INFO or WARN in production
+provide Rolling policies(time based and size based) to reduce file size and improve performance
+provide compression(gzip) to rollout file to reduce disk space usage.
+use lightweight destination like console or file instead of db or server to reduce latency
+use garbage free logging to reduce unnecessary object creation
+limit the number of appender if we add both console and file appender it will log message
+to both destination which increase latency
+avoid logging sensitive information.
+
 How would you implement different loggers for different modules or packages in a Java application?
+in log4j2.xml there is <Loggers></loggers> in this we can provide different types
+of logger. root logger and level for root logger
+<Loggers>
+<root level="info"></root>
+<logger name="package or class name" level="debug" additivity="false"> // like this we can create multiple logger
+    <appender-ref ref="Console"/>
+    <appender-ref ref="File"/>
+ </logger>
+</loggers>
+in above code snippet I have made additivity as false because if it is true then the log event will be passed to parent logger by given logger
+which create duplicate log message in both appender.
+in logback.xml
+<root level="info">
+    <appender-ref ref="Console"/>
+    <appender-ref ref="File"/>
+</root>
+<logger name="package or class name" level="debug" additivity="false">
+    <appender-ref ref="Console"/>
+</logger>
 A production system generates logs that are too noisy (large volume); what strategies would you propose to improve logging efficiency?
 How would you implement centralized logging in a distributed microservices-based system?
 You need to integrate an external library that uses java.util.logging, but your application uses SLF4J. How would you handle this?

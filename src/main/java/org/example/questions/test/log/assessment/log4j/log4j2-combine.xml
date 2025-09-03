@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Configuration status="WARN">
+    <appendes>
+        <RollingFile name="RollingFileAppender" fileName="logs/app.log" filePattern="log/app-%d{yyy-MM-dd}-i%.log.gz">
+            <PatternLayout>
+                <Pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5{level} %logger{36} - %msg%n</Pattern>
+            </PatternLayout>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+                <SizeBasedTriggeringPolicy size="10MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="30"/>
+        </RollingFile>
+        <Loggers>
+            <root level="info">
+                <appender-ref ref="RollingFileAppender"/>
+            </root>
+            <logger name="org.example.questions.test.log.assessment" level="debug" additivity="false">
+                <appender-ref ref="RollingFileAppender"/>
+            </logger>
+        </Loggers>
+    </appendes>
+</Configuration>
