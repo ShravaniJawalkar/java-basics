@@ -1,0 +1,2 @@
+dockerFIle- if we want to create custom image we use docker file
+docker-compose- if image is already exist we just need to pull it by providing image name and version and additional configuration

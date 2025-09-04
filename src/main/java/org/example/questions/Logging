@@ -403,3 +403,32 @@ log4j-1.2.api-2.17.1.jar-provide backward compatibility of log4j1.x api
 log4j-core-2.17.1.jar-log4j core implementation
 log4j-api-2.17.1.jar-log4j api
 and did configuration in log4j2.xml file with async appender for better performance
+
+
+whe we have to integrate the logs to elk stack we need three components
+Logstash-
+this used as a central hub to collect logs from different sources(Web Server, Application Server, DB server)
+and send it to elk stack. it mainly does three things
+Collection:- Collect the logs from different sources of our infrastructure(web server, app server, db server)
+it use different plugin to collect the log such as filebeat, UDP, TCP, HTTP etc.
+Transformation:- it transform the captured log into structured format like json.
+and can extract the filed example extracting logging level and timestamp from log message
+and adding geo location from ip address.
+Note:- this has persistence option as well if server get crash due to some reason data will not be lost.
+by default it is disable we need to enable it in configuration file
+Send :- then it send the transformed log to ElasticSearch
+
+ElasticSearch-
+Elastic search is a heart of ELK stack it is ued to store and index data on ELK stack.
+it does following things
+Store data:- store the data in from of JSON document for better parsing.
+Indexing- for quick search . it uses inverted indexing for quick search. it contains specific keywork
+for fast search of large data set.
+Search and Analysis:- it provide powerful search and analysis functionality where we can dynamically search data
+based on timestamp and other parameters. ex(count the Average error response in one day or count average response for particular api in one day)
+
+Kibana- it is basically user interface of elk stack. it is data visualisation tool.
+provide three main things
+Discover- enable us to search the log data by writing simplified query
+Visualize(metrics and dimension)- allow us to creat pie chart and line graph etc. for better performance analysis
+Dashboard- allow us to combine multiple visualisation ins single dashboard for better monitoring and analysis.
