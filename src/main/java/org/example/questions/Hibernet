@@ -51,21 +51,27 @@ Hibernate architecture contains
 6.criteria - This is a way to create queries using a programmatic approach, allowing for dynamic query generation based on criteria objects.
 
 4. Can you tell the difference between getCurrentSession and openSession methods?
-getCurrentSession()
-This method returns the session bound to the context.	.
-This session object scope belongs to the hibernate context and to make this work hibernate configuration file has to be modified by adding <property name = "hibernate.current_session_context_class"> thread </property>. If not added, then using the method would throw an HibernateException.
-This session object gets closed once the session factory is closed.
-In a single-threaded environment, this method is faster than openSession().
-openSession()
-This method always opens a new session
-A new session object has to be created for each request in a multi-threaded environment. Hence, you need not configure any property to call this method
-It's the developer’s responsibility to close this object once all the database operations are done.
-In single threaded environment, it is slower than getCurrentSession()single-threadeda
+getCurrentSession:-
+this is tightly couple to Hibernate transaction
+once Transaction is complete(either commit or rollback) this session object will be closed automatically.
+we need to explicitly enable it in hibernate.cfg.xml or application.properties file by setting
+hibernate.current_session_context=thread
+use ful for centralize web application where session is managed by framework like spring(Spring/JAVAEE).
+
+openSession:-
+for each hibernate transaction we need to explicitly create new session object.
+here session no longer associated with single thread and hibernate transaction.
+Session session= sessionFactory.openSession();
+transaction.commit();
+here we need to explicitly close the session once transaction is complete.
+session.close();
+useful when you want full control over session management.
+use case multiple session object is created to perform multiple db operation in same transaction.
 
 1. What happens when the no-args constructor is absent in the Entity bean?
 
 Can we declare the Entity class final?
-No because hibernate creates proxy class for the entity class for
+No because hibernate creates proxy class for the entity class. for
 lazy loading which call the db when actually the object get invoke. in proxy class it extend the entity bean class so if we create it final then we can't extend it.
 an hence lazy loading is not supported.
 
@@ -137,7 +143,6 @@ both are use to reattaches the detached entity to the persistent context. with d
 the entity object is present in memory but no longer associated with persistent context.
 merge() - create new managed entity instance and copy the state from detach entity to managed entity instance.
 it does not throw exception  if entity already present in session. it automatically maintain consistency between db and persistent context
-it useful in case when data is inconsistent between db and persistent context.
 it useful in case when data is inconsistent between db and persistent context.
 update() - reattach to the current entity instance. it can raise NonUniqueObjectException  if the entity is already present in the persistent context.
 it useful whe the data state is consistent between db and persistent context.

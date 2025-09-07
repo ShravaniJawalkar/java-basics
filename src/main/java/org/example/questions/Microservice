@@ -62,7 +62,15 @@ use of asynchronous communication using message broker like Kafka, RabbitMQ for 
 
 What strategies would you use to handle data consistency between microservices?
 using SAGA pattern for distributed transaction management.
+
 How do you maintain loose coupling and high cohesion between services?
+different design patterns
+eureka discovery
+api gateway
+circuit breaker
+rate limiter
+defining api contracts
+use light weight protocol for communication
 
 What is contract testing, and why is it important in microservices?
 it defines interaction between consumer and producer
@@ -93,7 +101,7 @@ AsyncApi - support event-driven architecture
 
 OpenAPI/Swagger
 cloud:spring-cloud-starter-contract-verifier-
-enforcing producer to strictly adder with consumer contract.
+enforcing producer to strictly adhere with consumer contract.
 generating unit test case from openApi.yml and validating the request. consumer driven contract
 org.mock-server:mockserver-netty:5.14.0- partially it is correct that it mock producer service for contract testing.
  it mocks the http request, and provide richer support on request validation, interception and response customization, fault injection and proxy creation but independent of framework

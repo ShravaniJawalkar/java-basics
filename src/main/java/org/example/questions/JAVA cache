@@ -230,6 +230,8 @@ so we need to use Least frequently use strategy because product catalog is frequ
 here we need to count the usage of cache data and prioritize accordingly
 suppose we need to cache some static data such product images we can use fifo strategy idle for simple static data
 suppose we need to cache user session data which get change frequently and need to be evict after some time least recently use strategy is preferred
+
+
 Describe how you would configure dynamic TTL for user session data stored in Redis.
 we can use redis set command to dynamically set ttl
 redisTemplate.opsForValue().set("sessionKey", sessionData, Duration.ofMinutes(30));
@@ -265,14 +267,12 @@ How would you implement pure on-heap caching in a Java application?
 using concurrentHashMap or ehcache or caffeine cache or guava cache.
 
 How would you configure local off-heap caching in a Spring Boot application?
-need to add org.ehcache dependency, spring boot starter data cache dependency, spring boot starter spring context support dependency
+need to add org.ehcache dependency, spring boot starter data cache dependency, java-cache-cache-api dependency
+
 @EnableCaching on @SpringBootApplication class
-I configured ehcache programmatically in app config class
-Create EhcCacheProvider bean using Caching.getCachingProvider()(type EhcacheCachingProvider)
-create a CachingConfiguration object and add ResoucePoolsBuilder.newResourcePoolsBuilde().offHeap(100,MemoryUnit.MB) to it.
-then create Configuration object of Ehcache and set cacheConfiguration object to it with cache name.
-create CacheManager bean and initialize it with above configuration object.
-then return new JcacheCacheManager(cacheManager) from CacheManager bean method.
+ehcache.xml file to configure off-heap cache define offHeap size
+and ttl default eviction strategy is LRU
+spring..jcache.config=classpath:ehcache.xml in application.yml file
 then use Spring cache annotation such as @cacheable, @CacheEvict, @CachePut on service method to use cache.
 
 
@@ -324,6 +324,8 @@ allkey-random - keys irrespective off ttl are evicted randomly
 
 Memcached - by default it support LRU eviction policy
 Hazelcast by default none but after configuration it support LRU and LFU eviction policy
+
+
 
 // this all question should be skipped
 //skip

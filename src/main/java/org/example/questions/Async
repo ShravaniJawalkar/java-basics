@@ -14,6 +14,7 @@ helpful in dbquery, remote api call, file processing where it take time to execu
 
  Q2: How do you handle exceptions in @Async methods?
  by default it is handle by AsyncUncaughtExceptionHandler which log the exception.
+
  Q3: What happens if you call an @Async method from within the same class?
 
  if we call async method within same class then that will not executed in separate thread. it execute synchronously in main thread.

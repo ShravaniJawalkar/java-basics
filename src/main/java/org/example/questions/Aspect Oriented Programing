@@ -22,6 +22,7 @@ After Advice - execute after method execution.
 Around Advice - this is execute before and after method execution. here we use ProceedingJoinPoint to proceed with after execution logic.
 After Returning Advice - if method execution is successful and returns the value then this advice will be executed.
 After Throwing Advice - if method execution throws an exception then we used this advice.
+
 Q6: What is a pointcut in AOP? How do you define and use pointcuts?
 Point cut - a predicate expression where we want to apply advice or crosscutting concern.
 @Pointcut("exception(* com.example.service.*(..))")
