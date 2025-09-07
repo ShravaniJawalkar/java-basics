@@ -188,6 +188,7 @@ use of
 
 What are @Cacheable and @CacheEvict annotations in Spring? Provide examples of how these annotations can be used with Redis.
 How does Spring Boot handle serialization for storing data in Redis? How can you customize serialization/deserialization in your Redis cache implementation?
+busing builtin java serializer :- Serializable interface
 
 Practical Scenario Questions:
 
