@@ -17,3 +17,10 @@ but in java String class is an object that contains a sequence of characters
  7. Can we compare String using == operator? What is the risk?
  if we compare it will compare it's reference which will not be same so it will return false
  so if want to compare if two strings are equal we need to use equalTo() method
+
+
+ design principles
+ 1. SOLID principle - Single responsibility, Open-closed, Liskov substitution, Interface segregation, Dependency inversion
+ 2. KISS - keep it simple stupid
+ 3. DRY - Do not repeat yourself
+

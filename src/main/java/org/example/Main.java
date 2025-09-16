@@ -22,5 +22,14 @@ public class Main {
        long end1 = System.currentTimeMillis() - start1;
         System.out.println("Time taken: " + end1 + " ms");
         System.out.println("Sequential processing completed.");
+
+        System.out.println("Factorial of 5 is: " + getFactorial(5));
+    }
+
+    private static int getFactorial(int n){
+        if(n == 1){
+            return n;
+        }
+        return n * getFactorial(n - 1);
     }
 }
