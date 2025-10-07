@@ -1,0 +1,491 @@
+Below is a comprehensive list of questions that could be asked by an interviewer for a Java Backend Developer role based on the provided job description. The questions are categorized based on the various skills, qualifications, and experience mentioned.
+
+---
+
+### **General Java Knowledge**
+1. Can you explain the key features of Java?
+        functional interface- consumer, supplier, function, predicate
+        lambda expression-
+        default, static methods in interface
+        dateTime API- java.time.*. replaced java.util.Date, java.util.calender.
+        optional API- to handle NullPointerException
+        streamAPI-
+2. What are the differences between Java 8 and Java 11 (or the latest version you're familiar with)?
+java 11 feature
+    ZGC garbage collection introduced
+    local variable var
+    string modernization - strip(), line(), repeat()
+    Optional api method addition isEmpty.
+    HTTP Client API- java.net.HttpClient replaced HttpUrlConnection
+
+    java 21
+        LTS support for 8+ years
+        GC- Shenandoah ZGC
+        Virtual Thread
+        Record and switch pattern matching
+        scoped value
+        SequencedCollection
+
+
+3. Describe the concept of "immutability" in Java. Why is the `String` class immutable?
+    immutability meaning once it is initialised it can't be modified. String is immutable because it does cache pooling in string pool.
+    suppose one method is accessing String object and trying to modify it then its reference will change not actual value. the actual value remains the same which will not affect other
+    method execution which are using same String object.
+
+4. What is the difference between `Checked` and `Unchecked` exceptions in Java?
+checked exception - are compile time exception.
+these exception we need need to define explicitly using Throws at method level
+it is mandatory to handle it in try-catch block
+ClassNotFound, IO exception, SQL Exception. extends Exception class
+Unchecked- runtime exception. not mandatory to add try-catch or throws
+extends RuntimeException class
+NoClassDefError, NullPointer, Arithmetic Error
+5. What are Java annotations, and how are they used in development?
+@FunctionalInterface(Runtime,ClassLevel), @Override(Source,Method),SuppressWarning(Source),@Deprecate(Source,Method/Class)
+ retention policy source , class, runtime
+6. Explain the significance of the `final`, `static`, and `volatile` keywords in Java.
+  final- final method can't be override
+   final class can't be extended
+   final data members are immutable
+ Static -  static methods are loaded when class is loaded, called at class level does not need object to call, and can use static data members only.
+   static data members are initialize at class level, can be access with class name if declare public. shared among the object if not final then the value change by one object
+   visible to other. and can be access by static methods.
+  Volatile - it is useful for multithreaded environment . to share data member among the thread. so its updated value visible to other thread. generally used for flags.
+7. What is the purpose of Java’s garbage collector, and how does it work?
+        Java garbage collector collect / reclaim the memory of unreachable object and free up it.
+        internally there are different algorithm used for garbage collection according to java version
+        but most general steps are. identify GC root( thread stack references and Global Variables)
+        travers through the graph/heap for identify the live objects
+        perform mark and sweep to objects
+        and then perform compaction for avoiding memory fragmentation.
+        heap memory divided into regions yong generation, old generation, metaspace(outside of heap has class metadata info and static variable, enums)
+        StrongReference ,SoftReference, WeakReference.
+
+8. Can you describe the differences between `==` and `.equals()` in Java?
+== just math the object reference does not check/match the actual content of object. equal does
+9. What are functional interfaces? Explain with examples of commonly used ones in Java 8.
+which has only one abstract method
+consumer
+void accept(T t)
+supplier
+R r get()
+function
+R r apply(T t)
+predicate
+boolean test(T t)
+---
+class loader
+BootStrapClass Load- load the classes present in class path
+External or Platform class Loader- load the classes which are present in external dependency
+Application class loader- load classes of current application
+Association - relation between classes one-to-one, one-to-many, many-to-many,
+Aggregation- has a relation
+composition - part of relation
+1. Can we serialize static variable? - no
+2. How to serialize static variable? - serialize it value of static data member
+use static getter and setter if data member private static
+use custom serialize logic like writeForObject, readObject.
+to make data member not part of serialization we can use transient keyword
+
+### **Java Frameworks (Spring, Hibernate)**
+10. What is the Spring Framework, and why is it widely used in Java development?
+    for building entreprise application, web application development , microservice building.
+    springMvc- web development
+    springBoot- starter support
+    SpringData- interaction with orm framework hibernate and JPA
+    springsecurity
+    springTest-
+    aspectOrientedPropgraming
+    SpringCloud
+    TransactionSupport
+    SpringDataCatch
+    its Inversion of Control- which manage the bean creation in IOC container and injecting dependency . remove tight coupling.
+11. Can you explain Dependency Injection (DI) in Spring and its benefits?
+        it uses inversion of control mechanism
+        here the IOC container manage the bean creation and adding external dependency to initialize given bean.
+        ex
+        engine
+        in car class
+        public Car(){
+        this.engine=new Engine()// tightly coupled
+        }
+        if in future suppose the engine has a sub classes
+        so we need to change the references of it in each an every file. it can lead consistency issue. and scaling issue as well
+
+        constructor injection
+        @Autowired
+        Car(Engine e){
+            engine=e;//loose coupling here dependency injected runtime
+        }
+        //setter injection
+        public void setEngine(Engine e){
+        this.e=e;
+        }
+
+        field injection -
+        @Autowired
+        private Engine engine;
+
+        in spring framework we were using xml base configuration for bean creation and injection. but maintaining those file is cumbersome.
+
+        so we used annotation based bean initialization and injection using @Autowired
+
+
+        TDD and BDD
+        Test driven development - it focusing on the writing test cases before functionality is even develop.
+        it focuses on functionality. basically here developer is involved who writes the unit test cases.
+        stages involved in TDD
+        Red Stage:-
+            here test case is written for the functionality that is not implemented yet
+        Green Stage:-
+            implement enough code for functionality so that test will pass
+        Refactor stage:-
+                refactor code according to new feature and additional functionality.
+                this use for code maintainability. code coverage and line coverage.
+        Repeat:-
+                continue writing the next test. covers the edge cases, negative scenarios.
+
+        Behaviour Driven Development:-
+            focus on behavior of the application. focus on business aspect
+            here collaboration happen between developer, tester/qa and non-technical stake holder
+            focuses on what system does not how system does it. follow, Given-When-Then approach
+            tool used is cucumber and gherkin.
+
+
+12. Describe the Spring Bean lifecycle.
+Application Start - Invoke Of IOC container(component scanning/configuration)- construct bean/instantiate a bean using default constructor or any given constructor config.
+- dependency injection - bean initialization beanPostProcessorBeforeInitialize() and beanPostProcessAfterInitialize. - postConstruct() - useBean- preDestroy()-destroy()
+
+13. What are Spring Boot starters? Can you name a few?
+reduce boilerplate code
+autoconfiguration feature
+compacting multiple relatable and dependent dependency in single starter dependency
+spring-boot-starter-web = spring core, embedded tomcat, spring web, jackson databind
+spring-boot-starter-test = junit5, mockito, assert dependency
+spring-boot-starter-data-jpa= jpa and hibernate dependency
+spring-boot-starter = logging dependency, autoconfiguration dependency.
+@SpringBootApplication= @Component,@EnableAutoConfiguration- scan all dependency form class path and external dependency to start application context(datasource,application.properties), @ComponentScan
+14. Explain the differences between JPA, Hibernate, and JDBC.
+Hibernate is ORM frame framework used to map JAVA objects to DB tables. underline it perform sql queries for the java methods written for the performing DB function
+in hibernate we don't need to write the boilerplate code for connecting to DB
+we just need to provide dataSource details either in application.properties
+spring.datasource.url
+spring.datasource.driverClassName
+spring.datasource.username
+spring.datasource.password
+or either defined in App configuration
+creating DataSource Object
+and it support predefined method for saving data and fetching data from DB
+save/persist, remove(), merge, flush, find(). provide transactional support but explicitly need to define it
+with either @Transaction or by using programmatic transaction approach. support JPQL and we can specify the connection pool size.
+no need to explicitly close connection.
+
+JDBC- it's a abstraction layer between our DB driver and JAVA object act as bridge,
+here in JDB lot of boilerplate code need to be run such as
+for getting db connection
+Class.forName("driver")
+con.getConnection(url,username,password)
+then write sql queries in prepare statement.
+write result set object to fetch result
+explicitly handle connection close
+JPA- specification built a abstraction layer over orm Framework. provide abstract methods to perform db function. under the hood call orm framework only.
+as it build on top of hibernate frame work. it is an interface.
+methods are save, saveAll, findById, findAll these are predefine method. we can define custom methods as well
+findUserByDepartmentId() internally it uses PartTree(spring.data) to parse the method and create sql query for the same.
+by default provide transactional support for method save, saveAll and delete.
+support JPQL and language which is DB platform independent. support pagination and sorting
+
+15. How does Hibernate manage database transactions, and what are common pitfalls?
+using @Transactional annotation and ProgrammaticTransaction
+ProgrammaticTransaction:-
+using TransactionTemplate(doInTransaction). and PlatformTransactionManager. DefaultTransactionDefinition.
+
+16. What is the purpose of `SessionFactory` in Hibernate?
+sessionFactory is one for one DataSource configuration
+creation session object
+thread-safe and share between session object
+hold db configuration and metadata information
+manage data base connection pools
+provide second level cache.
+17. How do you handle caching in Spring or Hibernate?
+in hibernate each session object provide first level cache. and session is per http request / thread.
+but we can enable second-level cache by defining use.second.level.cache in application.properties file. it will enable at
+SessionFactoryLevel which will be share among the multiple session
+we need
+spring-boot-starter-data-jpa(hibernet jcache)
+ehcache
+javax-cache api
+hibernet jcache
+hibernet -> hibernet j cache-> javax-cache api -> ehcache
+ehcache.xml
+define region
+timetolive
+eviction strategy by default LRU
+application.yml spring.jpa.properties.hibernate.cache.use_second_level_cache
+@cache(usage=ConcurrencyStrategy. , region="")
+ConcurrencyStrategy= READ_ONLY, NON_STRICT_READ_WRITE, READ_WRITE, TRANSACTIONAL
+
+in normal spring application we can define two types of cache
+local cache and distributed cache
+local cache is specific to that spring application/microservice
+to setup it we need local cache
+on heap - concurrent hashmap, ehcache, caffeineCache
+off heap- ehcache, caffeineCache
+implementation
+spring-boot-starter-cache
+javax-cache-api
+ehcache
+ehcache.xml- define eviction strategy, time to live and OnHeapSize
+@cachePut - each time call to underline resource and update the cache
+,
+@cacheable - first time call to underline resource and update cache. next time data fetch from cache,
+@cacheEvict - remove entry from cache.
+
+on entity class de
+in Hibernate we need to enable the second level cache by given property
+use
+18. What are some common annotations used in Spring (e.g., `@RestController`, `@Repository`)? Explain their purpose.
+
+---
+
+### **RESTful APIs and Web Services**
+19. What is REST, and how does it differ from SOAP? Why is REST preferred for modern web services?
+REST is light weight api that support HTTP protocol
+JSON,HTML and XML response type.
+stateless
+cache control
+client-server architecture
+properly resource exposed
+usage of HTTP method
+SOPA-> support XML. support both session/stateful and stateless
+Support HTTP,SMTP,FTP different protocol
+Support ACID transaction, WS security.
+
+20. How do you implement a REST API in a Spring Boot application?
+using Feign Client. where spring-cloud-starter-openFeign
+21. Explain the different HTTP methods (GET, POST, PUT, DELETE) and where they are typically used in REST.
+22. How do you handle exceptions for RESTful services in Spring?
+23. What HTTP response codes are commonly used in REST APIs, and when should you use them?
+1xx - 100 informational
+2xx- success 200 ok
+201(created)
+202(accepted)
+204(no-content)-delete
+206-partial content
+redirection 3xx = 301(move permanently)
+302 = move temporary
+client error 400(bad request), 401(unauthorized), 403(forbidden), 404(Not found), 405(method not allowed)
+server side error 500(Internal server error), 501(Not implemented), 502(bad gateway), 503(service unavailable), 504(gateway time out)
+
+24. How do you secure REST APIs? Can you explain how OAuth2 or JWT works?
+spring security
+
+---
+
+### **Database Technologies (SQL, NoSQL, PLSQL)**
+25. What are the differences between SQL and NoSQL databases? When would you choose one over the other?
+26. What is a join in SQL? Could you explain the difference between INNER JOIN, LEFT JOIN, and RIGHT JOIN?
+27. Can you write a SQL query to retrieve duplicate records from a table?
+select username, count(*) as duplicate from user group by username having count(*) >1;
+28. How do transactions in SQL databases work, and what is the significance of ACID properties?
+begin
+commit;
+rollback;
+29. What are stored procedures and functions in PL/SQL? When would you use them?
+procedure are written for DML operations, does not return value directly return value indirectly with out parameter
+can not be used with select statement.
+usage of procedure
+when we want to perform list of DML operation.
+such as validating, Updating the record and logging
+performing complex transaction logic for operations
+procedure can be directly call by web-application adn microservice to perform the DB operations
+functions are used to perform computation/calculation and data transformation.
+it returns value with RETURN directly(single or multiple)
+used with select statement
+both can be used - Maintainability(modular code) , improve performance(precompile set of queries). Encapsulation of Logic,reusability( those functions can be reuse)
+30. How do you handle performance optimization for database queries?
+using index for query result which are fetched multiple times and the updates for that result are less.
+selection of index :-  index b+ tree index for general lookup and bitmap index for the column which has less distinct value.
+add index on composite key
+avoid more usage of sub quires.
+avoid using select *
+use where instead of having.
+31. What is indexing in SQL, and how does it help performance?
+
+---
+
+### **Development Tools and Build Tools**
+32. How do you use IntelliJ IDEA for Java development?
+33. What are the differences between Maven and Gradle? Which one do you prefer and why?
+for maven to perform current step basically test then it need to perform all it's previous phases. it use with  java only and has xml configuration.
+phases
+validate-
+compile
+test
+package
+verification
+install
+deploy
+gradle build is incremental. it use groovy script/kotlin that can be use with multiple language. python, java nodejs
+incremental builds
+build caching
+support both imperative and declarative build
+multi project build support
+write custom task
+34. What are build profiles in Maven, and how are they used?
+so profile is useful when we want to run different configurations according to different environment
+<profiles><profile>
+<id>dev</id>
+<properties></properties>
+</profile></profiles>
+35. Can you create a custom task in Gradle? Provide an example.
+yes
+task greet{
+    ext.person='word'
+    doLast{
+        println "Hello, ${person}!"
+    }
+}
+
+36. Explain the dependency management system in Maven or Gradle.
+maven
+<dependency>
+    <groupid></>
+    <artifactid></artifact>
+    <scope></>
+    <version></>
+</dependency>
+scopes
+    compile - default scope
+    provided - compile + runtime
+    test -
+    runtimeonly
+
+exclude of transitive dependency
+      <dependency>
+          <groupid></>
+          <artifactid></artifact>
+          <scope></>
+          <version></>
+          <exclusions>
+            <exclusion></exclusion>
+          </exclusions>
+      </dependency>
+
+Remote repository
+<repositories>
+<repository>
+<id></id>
+<url></url>
+</>
+</repositories>
+
+Gradle
+dependencies{
+implementation ''
+testimplementation ''}
+scope implementation default scope
+testImplementation
+runtimeOnly
+compileOnly
+exclusion of transitive dependency
+dependencies{
+implementation{
+''
+exclude group '' model ''
+}
+}
+remote repository
+{
+mavenCentral()
+Jcentral()
+mvn {url ()}//custom repo
+}
+---
+
+### **Debugging and Testing**
+37. How do you debug a Java application? What tools or techniques do you use?
+38. What is a `StackOverflowError`, and how would you troubleshoot it?
+39. Explain how you would set up and use JUnit to test your application.
+40. What is mocking in the context of unit testing? Can you explain how you use tools like Mockito?
+41. How do you write integration tests for REST APIs?
+
+---
+
+### **Groovy Scripting**
+42. What is Groovy scripting, and how does it compare to Java?
+43. Have you used Groovy for automation tasks? Can you share an example?
+44. How do you use Groovy with Gradle for custom build logic?
+
+---
+
+### **Performance and Optimization**
+45. How do you identify and resolve bottlenecks in a Java application?
+46. What are some common performance issues you’ve encountered when working with Java applications, and how did you resolve them?
+47. Describe how you would set up and analyze application performance monitoring.
+
+---
+
+### **Teamwork and Collaboration**
+48. Have you worked in virtual or geographically distributed teams? What challenges did you face, and how did you overcome them?
+49. How do you handle conflicts in a team environment?
+50. Can you provide an example of a time when you collaborated with front-end developers to deliver a project?
+
+---
+
+### **Bonus Questions Based on Preferred Qualifications**
+51. Why do you think IntelliJ IDEA is preferred by many developers over other IDEs like Eclipse?
+52. How do Oracle SQL databases differ from other databases, such as MySQL or PostgreSQL?
+53. Explain how `Gradle` build automation compares to alternatives like Jenkins pipelines.
+54. Have you been involved in writing custom plugins for Maven or Gradle? Can you describe the process?
+55. Do you have experience optimizing JUnit test execution? If so, how did you achieve it?
+
+---
+
+### **Behavioral/Soft Skill Questions**
+56. Can you describe a challenging problem you solved in a Java project? What approach did you take?
+57. How do you ensure a balance between writing clean code and meeting tight deadlines?
+58. How do you stay updated with advancements in Java and related technologies?
+
+---
+
+### **Scenario-Based Questions**
+59. If you were asked to create a REST API from scratch, what would your approach be, and what tools/technologies would you use?
+60. What steps would you take if an application you built suddenly started experiencing increased response times in production?
+
+---
+
+### **Conclusion**
+Preparing for the mentioned questions will give you a well-rounded understanding of the topics that could be discussed in an interview for this role. Tailor your answers based on your own experiences and expertise. Good luck!
+
+
+
+garbage collector usage according to the java versions
+java8- SG,PG,CMS GC, G1 GC,
+java11 - SG,PG,CMS GC, G1 GC, ZGC, Epsilon GC
+java21- SG,PG,CMS GC, G1 GC, ZGC, Epsilon GC, Shenandoah GC
+
+
+JAVA 21 advantages
+stability and support - it provide long term support for 8+ years for security and bug fixes
+improve security- removed the legacy api security cryptography SHA1, DSA algorithm, thread management api(thread.suspend(), thread.resume()) replace TS1.0/TLS1.1 to TLS 1.2/TLS 1.3
+security apis such as(javax.security.acl, java.security.auth.policy, java.securityManager)
+enhanced user experience- fastly processing http request using light weight virtual threads
+cost optimization - reducing the burden of thread creation on OS . using light weight threads virtual thread that will helpful for performing IO operation fast.
+new Development feature.
+scalability- helpful for cloud based microservice architecture.
+improved GC performance= pause time is less than 10 millisecond.
+
+
+springBoot 3.4.6
+support jakartaEE modern API.
+first class support to GraalVM Native image- which remove cold start issue with docker images.
+normally springboot application run with JVM takes time because of class loading, bytecode interpretation, warm-up(runtime profiling),
+graal vm convert the code into machine readable form. at compile time. so need of JVM.
+Support of Declarative webClient which support nonblocking reactive HTTP calls.
+Security Enhancement- built on top of Spring.Security6.x(provides Oauth2.1 and OpenId1.0)
+easy setup of SSO with Azure AD, Google, Okta.
+Simpler configuration = support application.yml
+Support java17+
+
+

@@ -1,0 +1,170 @@
+1. EC2 Basics
+
+What is Amazon EC2? How does it differ from traditional virtual machines?
+What are the different types of EC2 instance families, and how do you choose the correct instance type for your application?
+Explain on-demand, reserved, and spot instances in EC2. When would you use each?
+What is an AMI (Amazon Machine Image), and how is it used in EC2? Can you create a custom AMI?
+it is a virtual machine for ec2 instance
+it has preconfigure os, software(web server, database, java etc), preconfigure set of firewall rules.
+security patch and updates
+yes we can create custom images
+click on ec2 instance-action-images and templates - create image
+Explain the difference between public, private, and elastic IP addresses in EC2.
+public ips = static through instance lifecycle running. once it is terminate new IP is assign
+automatically assign by AWS
+private IPs:- this are not connected to IG. it is used within VPC or used to communicate with another VPC instance(vpc peering).
+useful to connect to backend service. database server
+elastic ips - these are static ips which remains same regardless of instance termination configure by user manually through
+AWS console, CLI and SDK
+use case for disaster recovery we can easily assign this IP from one instance to another
+2. EC2 Instance Scaling and High Availability -
+
+How do you implement auto-scaling for EC2 instances? What are the main components of an Auto Scaling Group?
+Explain how Elastic Load Balancers (ELB) work with EC2 instances. How do you configure health checks for the load balancer?
+What are placement groups, and what different types are available (cluster, spread, partition)? When would you use each?
+3. EC2 Storage
+
+What is the difference between EBS (Elastic Block Store) and Instance Store? What are the use cases for each?
+Explain the different types of EBS volumes (e.g., General Purpose SSD, Provisioned IOPS SSD, Throughput Optimized HDD, Cold HDD) and when to use them.
+How do you back up EC2 instances (e.g., snapshots)? What are the best practices for EC2 backups?
+How can you encrypt EBS volumes, snapshots, and AMIs?
+Is it possible to attach the same EBS volume to multiple EC2 instances? If not, how can you share data across instances?
+4. Networking and Security
+
+Describe security groups and network ACLs. How are they different, and how do they work together to secure EC2 instances?
+How would you troubleshoot connectivity issues in an EC2 instance (e.g., SSH access, application-level access)?
+What is a bastion host and how is it implemented using EC2?
+How can you enable private access to your EC2 instances using VPC, subnets, and NAT gateways?
+Explain the concept of Elastic IP in EC2. When and why would you need it?
+5. EC2 Optimization
+
+How do you optimize the cost of your EC2 instances in production environments?
+What are Reserved Instances, and how do they differ from Savings Plans in terms of cost optimization?
+How do you monitor EC2 instances using CloudWatch Metrics and set up alarms for proactive action (e.g., CPU utilization, memory utilization)?
+How do you troubleshoot performance issues on EC2 instances, such as high CPU/memory usage or I/O bottlenecks?
+6. Advanced EC2 Scenarios
+
+Explain how you can migrate an on-premises application to EC2 instances. What steps are involved in such a migration?
+Describe the process of deploying an application across multiple EC2 instances in different regions for disaster recovery.
+What are the differences between IPv4 and IPv6 in EC2, and how do you enable IPv6 for your instances?
+How do you use EC2 instance metadata? Provide examples of its use.
+Can you stop or terminate a Spot Instance and preserve its data? If so, how?
+
+Questions on Amazon S3
+1. S3 Basics
+
+What is Amazon S3, and how does it provide scalability and durability?
+What are storage classes, and how do you decide which class to use (e.g., Standard, Intelligent-Tiering, Glacier, etc.)?
+Explain the key components of an S3 bucket (e.g., objects, keys, and bucket policies).
+How does S3 handle data consistency for PUT and GET operations?
+2. S3 Security
+
+How would you secure your S3 bucket? Explain the use of bucket policies, ACLs, and IAM roles.
+bucket polies are where we provide principles,action and resources and condition based on IP address or protocol
+ACLs= object level locking where  you define Grants{
+grantee: IAM user account or any other aws account
+permission
+}
+IAM roles is assign to specific service of AWS where it can perform operation on S3
+using IAM polies which include
+{
+version:
+statement:[
+effect: ALLOW/DENY,
+action:
+resource}]
+}
+What are S3 Block Public Access Settings, and when would you use them?
+when we want to restrict s3 access from internet gateway. it will be accessible inside vpc
+how to do it
+select s3 bucket
+Go to actions-> Permissions -> Block All public access -> Enable
+when we want s3 to be access internally by any aws service suppose EC2 want to upload some data on s3 bucket in that case it is helpful
+lambda function wants to store event result on s3 in that case it is helpful.
+
+Explain how server-side and client-side encryption work with Amazon S3.
+server-side = SSE-S3- AES256 - encryption and decryption handle by AWS
+SSE-KMS- encryption and decryption handle by AWS
+Client side SSE-C client will generate key and provide a key for each encryption to put data to S3 and decryption to get data from S3
+we can enable server side encryption
+
+What is an S3 Access Point, and how does it simplify access management for large-scale data lakes?
+it act as a intermediatory between aws services and s3
+component
+Access point Name Space - basically a url for accessing s3
+Access policies - Statement:[
+{
+effect
+principle
+action
+resource
+}]
+Network origin
+VPC
+internet gateway.
+it works well and seamlessly with aws lamda
+data lakes is central repository for storing large volume of raw data so adding bucket polices for this can be complex
+
+3. S3 Access and Data Management
+
+How do you manage permissions for S3 objects (e.g., public vs private vs restricted access)?
+
+Explain the function of pre-signed URLs. When would you use them, and how do they differ from bucket policies?
+provide the temproray access to the bucket object
+component of pre-sign
+    access key and secret to authenticate the user
+    object key- a resource key
+    expiration time=
+    HTTP method
+  we can create presign url with aws cli and sdk
+  aws cli
+  aws s3 presign bucket-path  expiry-in
+  to generate pre-sign for put need to used aws sdk
+
+What is Cross-Origin Resource Sharing (CORS) in S3, and how do you configure it?
+How do you enable versioning in S3 buckets? What are the benefits and costs of versioning?
+using AWS IAM console-> click on bucket -> go to property -> enable bucket versioning
+using cli
+aws apis3 --put-bucket-versioning --bucket <bucket name> --versioning-configuration ENABLE=true
+4. S3 Performance
+
+How would you optimize upload performance for large files to S3 (e.g., multipart uploads)?
+How do S3 Transfer Acceleration and VPC endpoints work to improve performance?
+What are Amazon S3 Batch Operations, and how do they simplify managing large-scale datasets?
+5. S3 Data Lifecycle Management
+
+How do you use lifecycle policies to automate data management in S3 (e.g., transitioning objects between storage classes)?
+Compare replication options in S3 (Cross-Region Replication vs Same-Region Replication).
+Describe scenarios for using S3 Object Lock to enforce data retention policies.
+6. Advanced S3 Features
+
+Explain the use of S3 Event Notifications. How can you trigger Lambda functions or SNS topics when an object is uploaded to S3?
+How would you host a static website using Amazon S3? Can you configure a custom domain name for your website?
+Describe how Query in Place works with tools like S3 Select and Amazon Athena.
+How can you integrate Amazon S3 Glacier for long-term archival? What is the process for retrieving data?
+7. Advanced S3 Scenarios
+
+Describe a scenario where you need to handle high throughput and frequent reads from S3. How does S3 handle concurrent requests?
+How do you migrate large datasets to Amazon S3? Discuss tools like AWS Snowball or AWS DataSync.
+What are the tradeoffs between Amazon S3 Glacier and S3 Glacier Deep Archive?
+How do you troubleshoot slow object upload/download performance in S3?
+Scenario-Based Questions
+For a senior-level role, you might also face real-world challenges designed to test your ability to architect and troubleshoot complex systems:
+
+EC2 Scenarios:
+"How would you design an architecture using EC2 instances to handle high availability for a web application hosted across multiple availability zones?"
+"You suspect resource exhaustion (CPU or memory utilization spikes) is causing EC2 instances to fail. How do you investigate and resolve the issue?"
+S3 Scenarios:
+"A developer accidentally deleted critical files in an S3 bucket without versioning enabled. How do you ensure data recovery or prevent this from happening in the future?"
+"You have an analytics workload storing terabytes of data in S3. How would you optimize costs while ensuring fast data retrieval for daily reports?"
+Behavioral/Advanced Design Questions
+"How do you balance cost, performance, and scalability when integrating EC2 and S3 for enterprise-wide solutions?"
+"Have you ever implemented disaster recovery using EC2 and S3? Walk us through your approach and the specific AWS services used."
+Pro Tips for Preparing
+Focus on practical scenarios and best practices for EC2 and S3.
+Understand architectural trade-offs for cost, scalability, and security.
+Leverage hands-on experience and AWS documentation to confidently discuss implementations.
+Be comfortable explaining concepts like high availability, data lifecycle management, auto-scaling, and monitoring.
+With strong preparation, you'll be equipped to showcase your expertise in both EC2 and S3 for senior roles!
+
+db sharding.

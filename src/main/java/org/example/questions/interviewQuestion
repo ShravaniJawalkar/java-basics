@@ -1,0 +1,11 @@
+parallel stream
+data sharding
+java stream
+internal working of hash map- how has colision happend , how hascode is calculated. if map is full the how next capacity is cacluated to store new key value pair
+write java code quick sort
+write java code how to identify it is circular linked list
+
+circular view error
+different IOC containers in Spring Boot
+Spring Boot Application Startup flow
+if there is no annotation provided on class will that class get load in IOC container
