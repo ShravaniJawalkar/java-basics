@@ -1,11 +1,38 @@
 parallel stream
 data sharding
 java stream
-internal working of hash map- how has colision happend , how hascode is calculated. if map is full the how next capacity is cacluated to store new key value pair
+internal working of hash map- how has collision happened , how hash-code is calculated. if map is full the how next capacity is cacluated to store new key value pair
 write java code quick sort
 write java code how to identify it is circular linked list
 
-circular view error
+circular view error - it generally comes when there is bidirectional mapping between two entities.
+suppose we have user and order entity
+user has one-to-many relation with order
+order has many-to one relation with user
+so in this case if order tries to do getUser then it does try to do the serialization and deserialization of object which cause the recursive loop
+to avoid this
+we can use
+JsonIgnore
+JsonReference and JsonBack Reference
+JsonIdentityInfo
+
 different IOC containers in Spring Boot
+Bean Factory Context
+Application context does early loading for singletone bean. it handle aop and event propagation and context hierarchy.
+WebApplicationContext- used case of web controllers. spring boot internally uses webApplicationContext which is child of application context
 Spring Boot Application Startup flow
 if there is no annotation provided on class will that class get load in IOC container
+if external bean configuration not provided and haven't used any annotation then it will be not loaded in IOC container
+
+
+why streams are lazy in nature.
+because it is used to process data
+it has a intermediate operation which is called by terminal operation
+it only process the data you need.
+
+
+when you will go with microservice and when you will go with monolithic
+when you will go with reactive stream approach when you will go with normal stream. under the hood what it use
+when we will use async and nonblocking async(message broker) explain use case
+difference between sql and nosql db
+why we use docker and what is kubernetes used for
